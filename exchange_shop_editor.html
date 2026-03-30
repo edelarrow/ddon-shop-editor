@@ -3,437 +3,1184 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DDON Exchange Shop Editor</title>
+<title>DDON — Exchange Shop Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&family=Uncial+Antiqua&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap');
 
-  :root {
-    --bg: #0a0c10;
-    --bg2: #10131a;
-    --bg3: #161b26;
-    --border: #1e2a3a;
-    --accent: #00c8ff;
-    --accent2: #ff6b35;
-    --accent3: #a855f7;
-    --gold: #f5c842;
-    --green: #22c55e;
-    --red: #ef4444;
-    --text: #c8d8e8;
-    --text2: #6b8099;
-    --panel: #0d1117;
-    --ref: #34d399;
-  }
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS — Dragon's Dogma palette
+   Stone, parchment, crimson, burnished gold
+═══════════════════════════════════════════════ */
+:root {
+  --stone-deep:    #0e0b08;
+  --stone-dark:    #181310;
+  --stone-mid:     #221c16;
+  --stone-light:   #2e2520;
+  --stone-border:  #3d3028;
+  --stone-raised:  #352a22;
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  --parchment:     #c8b896;
+  --parchment-dim: #8a7a62;
+  --parchment-faint:#4a3e30;
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Exo 2', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+  --gold:          #c8922a;
+  --gold-bright:   #e8c84a;
+  --gold-dim:      #7a5a1a;
 
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,200,255,0.012) 2px, rgba(0,200,255,0.012) 4px);
-    pointer-events: none;
-    z-index: 9999;
-  }
+  --crimson:       #8b1a1a;
+  --crimson-bright:#c02020;
+  --crimson-glow:  #e03030;
 
-  header {
-    background: linear-gradient(135deg, #060a10 0%, #0d1420 100%);
-    border-bottom: 1px solid var(--accent);
-    padding: 10px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 0 40px rgba(0,200,255,0.12);
-    position: sticky; top: 0; z-index: 100;
-    flex-wrap: wrap;
-  }
+  --sage:          #4a6b4a;
+  --sage-bright:   #6a9b6a;
 
-  header h1 {
-    font-family: 'Orbitron', monospace;
-    font-weight: 900;
-    font-size: 1rem;
-    color: var(--accent);
-    text-shadow: 0 0 20px rgba(0,200,255,0.5);
-    letter-spacing: 3px;
-    white-space: nowrap;
-  }
+  --ref:           #7ab87a;
 
-  .header-badge {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.62rem;
-    color: var(--ref);
-    background: rgba(52,211,153,0.08);
-    border: 1px solid rgba(52,211,153,0.3);
-    padding: 2px 8px;
-    border-radius: 3px;
-    white-space: nowrap;
-  }
+  /* Shadows & glows */
+  --shadow-deep: 0 8px 32px rgba(0,0,0,0.7);
+  --gold-glow:   0 0 12px rgba(200,146,42,0.25);
+  --crimsn-glow: 0 0 10px rgba(139,26,26,0.4);
+}
 
-  .header-actions { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-  .btn {
-    font-family: 'Exo 2', sans-serif;
-    font-size: 0.72rem;
-    font-weight: 600;
-    padding: 5px 12px;
-    border: 1px solid;
-    border-radius: 4px;
-    cursor: pointer;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-  .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
-  .btn-primary { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
-  .btn-primary:hover { background: #33d4ff; }
-  .btn-danger { background: transparent; border-color: var(--red); color: var(--red); }
-  .btn-danger:hover { background: rgba(239,68,68,0.15); }
-  .btn-success { background: transparent; border-color: var(--green); color: var(--green); }
-  .btn-success:hover { background: rgba(34,197,94,0.15); }
-  .btn-ghost { background: transparent; border-color: var(--border); color: var(--text2); }
-  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-  .btn-gold { background: transparent; border-color: var(--gold); color: var(--gold); }
-  .btn-gold:hover { background: rgba(245,200,66,0.1); }
-  .btn-purple { background: transparent; border-color: var(--accent3); color: var(--accent3); }
-  .btn-purple:hover { background: rgba(168,85,247,0.1); }
-  .btn-sm { padding: 3px 9px; font-size: 0.65rem; }
+/* ── BODY & BACKGROUND ── */
+body {
+  background-color: var(--stone-deep);
+  background-image:
+    /* Subtle vignette */
+    radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%),
+    /* Stone texture via noise-like layered gradients */
+    repeating-linear-gradient(
+      17deg,
+      transparent,
+      transparent 3px,
+      rgba(255,255,255,0.012) 3px,
+      rgba(255,255,255,0.012) 4px
+    ),
+    repeating-linear-gradient(
+      103deg,
+      transparent,
+      transparent 7px,
+      rgba(0,0,0,0.08) 7px,
+      rgba(0,0,0,0.08) 8px
+    ),
+    linear-gradient(180deg, #100d09 0%, #0e0b08 100%);
+  color: var(--parchment);
+  font-family: 'IM Fell English', Georgia, serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-  .layout { display: flex; height: calc(100vh - 52px); }
+/* Decorative corner flourishes on body via pseudo */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    /* Top border line */
+    linear-gradient(90deg, transparent 0%, var(--gold-dim) 20%, var(--gold) 50%, var(--gold-dim) 80%, transparent 100%) top / 100% 1px no-repeat,
+    /* Bottom border line */
+    linear-gradient(90deg, transparent 0%, var(--gold-dim) 20%, var(--gold) 50%, var(--gold-dim) 80%, transparent 100%) bottom / 100% 1px no-repeat;
+  pointer-events: none;
+  z-index: 9998;
+}
 
-  .sidebar {
-    width: 270px;
-    min-width: 270px;
-    background: var(--panel);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
+/* ── HEADER ── */
+header {
+  background:
+    linear-gradient(180deg, #1a1208 0%, #110e08 60%, #0e0b06 100%);
+  border-bottom: 2px solid var(--gold-dim);
+  box-shadow:
+    0 1px 0 rgba(200,146,42,0.15),
+    0 4px 20px rgba(0,0,0,0.7),
+    inset 0 -1px 0 rgba(0,0,0,0.5);
+  padding: 0 20px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
 
-  .sidebar-header {
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--bg2);
-  }
-  .sidebar-title { font-family: 'Orbitron', monospace; font-size: 0.6rem; color: var(--accent); letter-spacing: 2px; flex: 1; }
+/* Subtle top-left ornament */
+header::before {
+  content: '✦';
+  font-size: 0.65rem;
+  color: var(--gold-dim);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+header::after {
+  content: '✦';
+  font-size: 0.65rem;
+  color: var(--gold-dim);
+  opacity: 0.5;
+  flex-shrink: 0;
+  margin-left: auto;
+}
 
-  .tree { overflow-y: auto; flex: 1; padding: 6px; }
+header h1 {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--gold-bright);
+  letter-spacing: 3px;
+  text-shadow:
+    0 0 20px rgba(232,200,74,0.4),
+    0 1px 3px rgba(0,0,0,0.8);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 
-  .tree-shop { margin-bottom: 4px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+.header-badge {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.7rem;
+  color: var(--ref);
+  background: rgba(74,107,74,0.12);
+  border: 1px solid rgba(74,107,74,0.3);
+  padding: 2px 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
 
-  .tree-shop-header {
-    display: flex; align-items: center; gap: 6px;
-    padding: 8px 10px; background: var(--bg2);
-    cursor: pointer; user-select: none; transition: background 0.15s;
-  }
-  .tree-shop-header:hover { background: var(--bg3); }
-  .tree-shop-header.active { background: rgba(0,200,255,0.08); border-left: 2px solid var(--accent); }
-  .tree-shop-label { font-family: 'Orbitron', monospace; font-size: 0.58rem; color: var(--accent); letter-spacing: 1px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .tree-chevron { font-size: 0.58rem; color: var(--text2); transition: transform 0.2s; }
-  .tree-chevron.open { transform: rotate(90deg); }
+.header-divider {
+  width: 1px;
+  height: 28px;
+  background: linear-gradient(180deg, transparent, var(--stone-border), transparent);
+  flex-shrink: 0;
+}
 
-  .tree-categories { display: none; padding: 4px; }
-  .tree-categories.open { display: block; }
+.header-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: nowrap;
+  margin-right: 16px; /* space before the ::after ornament */
+}
 
-  .tree-cat {
-    display: flex; align-items: center; gap: 6px;
-    padding: 5px 8px; margin-bottom: 2px; border-radius: 3px;
-    cursor: pointer; font-size: 0.7rem; color: var(--text2);
-    transition: all 0.15s; border: 1px solid transparent;
-  }
-  .tree-cat:hover { color: var(--text); background: var(--bg3); }
-  .tree-cat.active { color: var(--gold); background: rgba(245,200,66,0.08); border-color: rgba(245,200,66,0.2); }
-  .tree-cat-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
-  .tree-cat.active .tree-cat-dot { background: var(--gold); box-shadow: 0 0 5px var(--gold); }
-  .count-badge { margin-left: auto; font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: var(--text2); background: var(--bg); padding: 1px 5px; border-radius: 2px; flex-shrink: 0; }
+/* ── BUTTONS ── */
+.btn {
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 5px 13px;
+  border: 1px solid;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+  position: relative;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
 
-  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.btn-primary {
+  background: linear-gradient(180deg, #1e1408 0%, #150f06 100%);
+  border-color: var(--gold);
+  color: var(--gold-bright);
+  box-shadow: 0 0 8px rgba(200,146,42,0.2), inset 0 1px 0 rgba(232,200,74,0.1);
+}
+.btn-primary:hover {
+  background: linear-gradient(180deg, #2a1c0a 0%, #1e1508 100%);
+  box-shadow: 0 0 14px rgba(200,146,42,0.35), inset 0 1px 0 rgba(232,200,74,0.2);
+  color: var(--gold-bright);
+}
 
-  .main-toolbar {
-    padding: 8px 14px; background: var(--bg2); border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  }
-  .breadcrumb { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: var(--text2); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .breadcrumb span { color: var(--accent); }
+.btn-danger {
+  background: linear-gradient(180deg, #1a0b0b 0%, #120808 100%);
+  border-color: var(--crimson);
+  color: #c87070;
+}
+.btn-danger:hover {
+  background: linear-gradient(180deg, #220e0e 0%, #190a0a 100%);
+  border-color: var(--crimson-bright);
+  color: #e89090;
+  box-shadow: var(--crimsn-glow);
+}
 
-  .search-box {
-    display: flex; align-items: center; background: var(--bg3);
-    border: 1px solid var(--border); border-radius: 4px; padding: 4px 10px; gap: 6px;
-  }
-  .search-box input { background: none; border: none; outline: none; color: var(--text); font-family: 'Exo 2', sans-serif; font-size: 0.73rem; width: 160px; }
-  .search-box input::placeholder { color: var(--text2); }
+.btn-success {
+  background: linear-gradient(180deg, #0d1a0d 0%, #091209 100%);
+  border-color: var(--sage);
+  color: var(--sage-bright);
+}
+.btn-success:hover {
+  background: linear-gradient(180deg, #122012 0%, #0d160d 100%);
+  border-color: var(--sage-bright);
+  box-shadow: 0 0 10px rgba(74,107,74,0.3);
+}
 
-  .content-area { flex: 1; overflow-y: auto; padding: 14px; }
+.btn-ghost {
+  background: transparent;
+  border-color: var(--stone-border);
+  color: var(--parchment-dim);
+}
+.btn-ghost:hover {
+  border-color: var(--gold-dim);
+  color: var(--parchment);
+  background: rgba(200,146,42,0.05);
+}
 
-  .cat-info-panel {
-    background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
-    padding: 12px 14px; margin-bottom: 14px; display: flex; align-items: flex-start; gap: 12px;
-  }
-  .cat-info-fields { flex: 1; display: flex; gap: 10px; flex-wrap: wrap; }
-  .field-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 160px; }
-  .field-label { font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: var(--text2); letter-spacing: 1px; text-transform: uppercase; }
-  .field-input {
-    background: var(--bg3); border: 1px solid var(--border); border-radius: 4px;
-    color: var(--text); font-family: 'Exo 2', sans-serif; font-size: 0.78rem;
-    padding: 5px 9px; outline: none; transition: border-color 0.15s;
-  }
-  .field-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,200,255,0.08); }
+.btn-gold {
+  background: linear-gradient(180deg, #1e1408 0%, #150f06 100%);
+  border-color: var(--gold-dim);
+  color: var(--gold);
+}
+.btn-gold:hover {
+  border-color: var(--gold);
+  color: var(--gold-bright);
+  box-shadow: var(--gold-glow);
+}
 
-  .appraisal-grid { display: flex; flex-direction: column; gap: 10px; }
+.btn-purple {
+  background: transparent;
+  border-color: #5a3a7a;
+  color: #9a6aba;
+}
+.btn-purple:hover {
+  border-color: #7a4a9a;
+  color: #ba8ada;
+  box-shadow: 0 0 10px rgba(90,58,122,0.3);
+}
 
-  .appraisal-card {
-    background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
-    overflow: hidden; transition: border-color 0.15s;
-  }
-  .appraisal-card:hover { border-color: rgba(0,200,255,0.25); }
+.btn-sm { padding: 3px 9px; font-size: 0.58rem; }
 
-  .appraisal-header {
-    display: flex; align-items: center; gap: 8px; padding: 9px 12px;
-    background: var(--bg3); cursor: pointer; user-select: none; border-bottom: 1px solid var(--border);
-  }
-  .appraisal-toggle { font-size: 0.65rem; color: var(--text2); transition: transform 0.2s; flex-shrink: 0; }
-  .appraisal-toggle.open { transform: rotate(90deg); }
-  .appraisal-label-text { flex: 1; font-weight: 600; font-size: 0.8rem; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* ── LAYOUT ── */
+.layout {
+  display: flex;
+  height: calc(100vh - 56px);
+}
 
-  .appraisal-body { padding: 14px; display: none; }
-  .appraisal-body.open { display: block; }
-  .appraisal-meta { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 272px;
+  min-width: 272px;
+  background:
+    linear-gradient(180deg, #141008 0%, #100d07 100%);
+  border-right: 1px solid var(--stone-border);
+  box-shadow: inset -1px 0 0 rgba(200,146,42,0.06), 2px 0 12px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-  .section-label {
-    font-family: 'Orbitron', monospace; font-size: 0.58rem; color: var(--accent2);
-    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;
-    padding-bottom: 4px; border-bottom: 1px solid rgba(255,107,53,0.25);
-  }
+.sidebar-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--stone-border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(180deg, #1a1408 0%, #141008 100%);
+  /* Decorative underline */
+  box-shadow: 0 1px 0 rgba(200,146,42,0.12);
+}
 
-  .item-table { width: 100%; border-collapse: collapse; font-size: 0.76rem; margin-bottom: 10px; }
-  .item-table th {
-    font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: var(--text2);
-    text-align: left; padding: 5px 7px; border-bottom: 1px solid var(--border);
-    letter-spacing: 1px; text-transform: uppercase;
-  }
-  .item-table td { padding: 5px 7px; border-bottom: 1px solid rgba(30,42,58,0.5); vertical-align: middle; }
-  .item-table tr:last-child td { border-bottom: none; }
-  .item-table tr:hover td { background: rgba(255,255,255,0.015); }
+.sidebar-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  flex: 1;
+  text-shadow: 0 0 10px rgba(200,146,42,0.3);
+}
 
-  .item-icon-cell { width: 38px; text-align: center; padding: 4px 6px !important; }
+/* Decorative rune-like dot separator */
+.sidebar-title::before {
+  content: '⚔ ';
+  opacity: 0.7;
+}
 
-  .item-icon {
-    width: 32px; height: 32px; border-radius: 3px;
-    border: 1px solid var(--border);
-    background: var(--bg3);
-    object-fit: contain;
-    display: block;
-    cursor: pointer;
-    transition: border-color 0.15s, transform 0.15s;
-    image-rendering: pixelated;
-  }
-  .item-icon:hover { border-color: var(--accent); transform: scale(1.15); }
+.tree { overflow-y: auto; flex: 1; padding: 8px; }
 
-  .item-icon-placeholder {
-    width: 32px; height: 32px; border-radius: 3px;
-    border: 1px solid var(--border); background: var(--bg3);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.5rem; color: var(--text2); cursor: pointer;
-    font-family: 'Share Tech Mono', monospace;
-    transition: border-color 0.15s;
-    user-select: none;
-  }
-  .item-icon-placeholder:hover { border-color: var(--accent2); color: var(--accent2); }
+.tree-shop {
+  margin-bottom: 6px;
+  border: 1px solid var(--stone-border);
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+}
 
-  .item-id-link {
-    font-family: 'Share Tech Mono', monospace; color: var(--accent); font-size: 0.7rem;
-    text-decoration: none; display: inline-flex; align-items: center; gap: 3px;
-    transition: color 0.15s;
-  }
-  .item-id-link:hover { color: var(--ref); }
-  .item-id-link .ext { font-size: 0.5rem; opacity: 0.55; }
+.tree-shop-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 10px;
+  background: linear-gradient(180deg, #1e1810 0%, #181410 100%);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+.tree-shop-header:hover {
+  background: linear-gradient(180deg, #241e14 0%, #1c1810 100%);
+}
+.tree-shop-header.active {
+  background: linear-gradient(180deg, #241a08 0%, #1c1406 100%);
+  border-left: 2px solid var(--gold);
+  box-shadow: inset 0 0 20px rgba(200,146,42,0.06);
+}
 
-  .item-amount { font-family: 'Share Tech Mono', monospace; color: var(--gold); }
+.tree-shop-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 1px;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 0 8px rgba(200,146,42,0.25);
+}
 
-  .item-input {
-    background: var(--bg3); border: 1px solid var(--border); border-radius: 3px;
-    color: var(--text); font-family: 'Exo 2', sans-serif; font-size: 0.73rem;
-    padding: 4px 6px; outline: none; width: 100%; transition: border-color 0.15s;
-  }
-  .item-input:focus { border-color: var(--accent); }
-  .item-input.amount { width: 60px; font-family: 'Share Tech Mono', monospace; color: var(--gold); }
+.tree-chevron {
+  font-size: 0.5rem;
+  color: var(--gold-dim);
+  transition: transform 0.2s;
+}
+.tree-chevron.open { transform: rotate(90deg); }
 
-  .crest-pill {
-    display: inline-flex; align-items: center;
-    font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: var(--accent3);
-    background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.2);
-    border-radius: 10px; padding: 2px 7px; max-width: 150px;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
+.tree-categories { display: none; background: rgba(0,0,0,0.25); }
+.tree-categories.open { display: block; }
 
-  /* Reference tooltip */
-  .ref-tooltip {
-    position: fixed;
-    z-index: 5000;
-    background: var(--bg2);
-    border: 1px solid var(--ref);
-    border-radius: 8px;
-    padding: 12px;
-    width: 215px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.65), 0 0 24px rgba(52,211,153,0.12);
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.12s;
-  }
-  .ref-tooltip.visible { opacity: 1; }
+.tree-cat {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  cursor: pointer;
+  font-family: 'IM Fell English', serif;
+  font-size: 0.72rem;
+  color: var(--parchment-dim);
+  transition: all 0.15s;
+  border-left: 2px solid transparent;
+}
+.tree-cat:hover {
+  color: var(--parchment);
+  background: rgba(200,146,42,0.05);
+  border-left-color: var(--stone-border);
+}
+.tree-cat.active {
+  color: var(--gold-bright);
+  background: rgba(200,146,42,0.08);
+  border-left-color: var(--gold);
+}
 
-  .tt-icon {
-    width: 48px; height: 48px;
-    border-radius: 4px; border: 1px solid var(--border);
-    background: var(--bg3); object-fit: contain;
-    display: block; margin-bottom: 8px;
-    image-rendering: pixelated;
-  }
-  .tt-icon-ph {
-    width: 48px; height: 48px;
-    border-radius: 4px; border: 1px solid var(--border);
-    background: var(--bg3); margin-bottom: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.4rem;
-  }
-  .tt-name { font-weight: 600; font-size: 0.78rem; color: var(--text); line-height: 1.3; margin-bottom: 3px; }
-  .tt-id { font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; color: var(--accent); margin-bottom: 6px; }
-  .tt-link {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
-    color: var(--ref); text-decoration: none; border-bottom: 1px dotted rgba(52,211,153,0.4);
-  }
-  .tt-divider { height: 1px; background: var(--border); margin: 8px 0; }
-  .tt-stat { display: flex; justify-content: space-between; font-size: 0.68rem; margin-bottom: 2px; }
-  .tt-stat-lbl { color: var(--text2); }
-  .tt-stat-val { color: var(--text); font-family: 'Share Tech Mono', monospace; }
+.tree-cat-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--stone-border);
+  flex-shrink: 0;
+}
+.tree-cat.active .tree-cat-dot {
+  background: var(--gold);
+  box-shadow: 0 0 5px var(--gold);
+}
 
-  /* Welcome */
-  .welcome {
-    display: flex; flex-direction: column; align-items: center;
-    justify-content: center; min-height: 100%; gap: 18px; text-align: center; padding: 40px;
-  }
-  .welcome-title { font-family: 'Orbitron', monospace; font-size: 1.3rem; color: var(--accent); text-shadow: 0 0 30px rgba(0,200,255,0.35); letter-spacing: 4px; }
-  .welcome-sub { color: var(--text2); font-size: 0.82rem; max-width: 420px; line-height: 1.6; }
-  .welcome-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 460px; width: 100%; }
-  .welcome-stat { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 12px; text-align: center; }
-  .welcome-stat .val { font-family: 'Orbitron', monospace; font-size: 1.3rem; color: var(--gold); }
-  .welcome-stat .lbl { font-size: 0.62rem; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; }
-  .ref-integration-badge {
-    display: inline-flex; align-items: center; gap: 7px;
-    background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.25);
-    border-radius: 6px; padding: 8px 14px; font-size: 0.72rem; color: var(--ref);
-    font-family: 'Share Tech Mono', monospace;
-  }
+.count-badge {
+  margin-left: auto;
+  font-family: 'Cinzel', serif;
+  font-size: 0.55rem;
+  color: var(--parchment-faint);
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--stone-border);
+  padding: 1px 5px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.tree-cat.active .count-badge {
+  color: var(--gold-dim);
+  border-color: var(--gold-dim);
+}
 
-  .drop-zone {
-    border: 2px dashed var(--border); border-radius: 8px; padding: 28px 44px;
-    cursor: pointer; transition: all 0.2s; font-size: 0.78rem; color: var(--text2);
-  }
-  .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); color: var(--accent); background: rgba(0,200,255,0.04); }
+/* ── MAIN PANEL ── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-  /* Modals */
-  .modal { display: none; }
-  .modal.open { display: flex; }
-  .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.72);
-    backdrop-filter: blur(4px); z-index: 1000;
-    display: flex; align-items: center; justify-content: center; padding: 20px;
-  }
-  .modal-box {
-    background: var(--bg2); border: 1px solid var(--accent); border-radius: 8px;
-    box-shadow: 0 0 60px rgba(0,200,255,0.18); padding: 22px;
-    width: 100%; max-width: 500px; max-height: 82vh; overflow-y: auto;
-  }
-  .modal-title { font-family: 'Orbitron', monospace; font-size: 0.8rem; color: var(--accent); letter-spacing: 2px; margin-bottom: 18px; text-transform: uppercase; }
-  .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+.main-toolbar {
+  padding: 8px 18px;
+  background: linear-gradient(180deg, #171209 0%, #131008 100%);
+  border-bottom: 1px solid var(--stone-border);
+  box-shadow: 0 1px 0 rgba(200,146,42,0.07), 0 2px 10px rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 
-  .tag { display: inline-block; font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; padding: 2px 6px; border-radius: 3px; }
-  .tag-blue { background: rgba(0,200,255,0.12); color: var(--accent); border: 1px solid rgba(0,200,255,0.25); }
-  .tag-orange { background: rgba(255,107,53,0.12); color: var(--accent2); border: 1px solid rgba(255,107,53,0.25); }
-  .tag-purple { background: rgba(168,85,247,0.12); color: var(--accent3); border: 1px solid rgba(168,85,247,0.25); }
+.breadcrumb {
+  font-family: 'IM Fell English', serif;
+  font-size: 0.72rem;
+  color: var(--parchment-dim);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.breadcrumb span { color: var(--gold); font-style: italic; }
 
-  .separator { height: 1px; background: var(--border); margin: 12px 0; }
-  .pool-section, .base-section { margin-bottom: 14px; }
+.search-box {
+  display: flex;
+  align-items: center;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid var(--stone-border);
+  border-radius: 2px;
+  padding: 4px 10px;
+  gap: 6px;
+  transition: border-color 0.15s;
+}
+.search-box:focus-within {
+  border-color: var(--gold-dim);
+  box-shadow: 0 0 8px rgba(200,146,42,0.1);
+}
+.search-box input {
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--parchment);
+  font-family: 'IM Fell English', serif;
+  font-size: 0.73rem;
+  width: 170px;
+}
+.search-box input::placeholder { color: var(--parchment-faint); font-style: italic; }
 
-  .modal-item-preview {
-    display: flex; align-items: center; gap: 10px;
-    padding: 8px 10px; background: var(--bg3);
-    border: 1px solid var(--border); border-radius: 4px; margin-top: 6px;
-  }
-  .modal-preview-icon {
-    width: 36px; height: 36px; border-radius: 3px;
-    border: 1px solid var(--border); background: var(--bg2);
-    object-fit: contain; flex-shrink: 0;
-    image-rendering: pixelated;
-  }
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px;
+}
 
-  ::-webkit-scrollbar { width: 5px; height: 5px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--text2); }
+/* ── ORNAMENTAL DIVIDER ── */
+.ornament-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 10px;
+  color: var(--gold-dim);
+  font-size: 0.7rem;
+}
+.ornament-divider::before,
+.ornament-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--stone-border));
+}
+.ornament-divider::after {
+  background: linear-gradient(90deg, var(--stone-border), transparent);
+}
 
-  .toast {
-    position: fixed; bottom: 18px; right: 18px;
-    background: var(--bg2); border: 1px solid var(--green); border-radius: 6px;
-    padding: 9px 14px; font-size: 0.75rem; color: var(--green);
-    font-family: 'Share Tech Mono', monospace; z-index: 9000;
-    animation: slideIn 0.2s ease; box-shadow: 0 0 20px rgba(34,197,94,0.15);
-  }
-  .toast.error { border-color: var(--red); color: var(--red); box-shadow: 0 0 20px rgba(239,68,68,0.15); }
-  @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+/* ── CATEGORY INFO PANEL ── */
+.cat-info-panel {
+  background: linear-gradient(180deg, #1c1610 0%, #18130e 100%);
+  border: 1px solid var(--stone-border);
+  border-radius: 2px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 2px 8px rgba(0,0,0,0.3);
+  /* Top accent line */
+  border-top: 2px solid var(--gold-dim);
+}
+
+.cat-info-fields {
+  flex: 1;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 160px;
+}
+
+.field-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: var(--gold-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.field-input {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--stone-border);
+  border-radius: 2px;
+  color: var(--parchment);
+  font-family: 'IM Fell English', serif;
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.field-input:focus {
+  border-color: var(--gold-dim);
+  box-shadow: 0 0 8px rgba(200,146,42,0.15);
+}
+.field-input option {
+  background: var(--stone-dark);
+}
+
+/* ── APPRAISAL CARDS ── */
+.appraisal-grid { display: flex; flex-direction: column; gap: 10px; }
+
+.appraisal-card {
+  background: linear-gradient(180deg, #1a1610 0%, #161210 100%);
+  border: 1px solid var(--stone-border);
+  border-radius: 2px;
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.appraisal-card:hover {
+  border-color: var(--gold-dim);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4), 0 0 8px rgba(200,146,42,0.06);
+}
+
+.appraisal-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: linear-gradient(180deg, #221c12 0%, #1c1810 100%);
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid var(--stone-border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.appraisal-toggle {
+  font-size: 0.55rem;
+  color: var(--gold-dim);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.appraisal-toggle.open { transform: rotate(90deg); color: var(--gold); }
+
+.appraisal-label-text {
+  flex: 1;
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--parchment);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+.appraisal-body { padding: 16px; display: none; }
+.appraisal-body.open { display: block; }
+.appraisal-meta { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+
+/* Section headers — styled like DD UI dividers */
+.section-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--stone-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold-dim), transparent);
+  opacity: 0.5;
+}
+
+/* ── ITEM TABLE ── */
+.item-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.76rem;
+  margin-bottom: 10px;
+}
+
+.item-table th {
+  font-family: 'Cinzel', serif;
+  font-size: 0.52rem;
+  font-weight: 700;
+  color: var(--gold-dim);
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--stone-border);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  background: rgba(0,0,0,0.2);
+}
+
+.item-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid rgba(61,48,40,0.4);
+  vertical-align: middle;
+}
+.item-table tr:last-child td { border-bottom: none; }
+.item-table tr:hover td {
+  background: rgba(200,146,42,0.03);
+}
+
+.item-icon-cell { width: 40px; text-align: center; padding: 4px 6px !important; }
+
+.item-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 2px;
+  border: 1px solid var(--stone-border);
+  background: rgba(0,0,0,0.4);
+  object-fit: contain;
+  display: block;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+  image-rendering: pixelated;
+}
+.item-icon:hover {
+  border-color: var(--gold-dim);
+  transform: scale(1.15);
+  box-shadow: 0 0 8px rgba(200,146,42,0.3);
+}
+
+.item-icon-placeholder {
+  width: 32px;
+  height: 32px;
+  border-radius: 2px;
+  border: 1px solid var(--stone-border);
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  color: var(--parchment-faint);
+  cursor: pointer;
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  transition: border-color 0.15s;
+}
+.item-icon-placeholder:hover {
+  border-color: var(--gold-dim);
+  color: var(--gold-dim);
+}
+
+.item-id-link {
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  color: var(--gold-dim);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: color 0.15s;
+  letter-spacing: 0.5px;
+}
+.item-id-link:hover {
+  color: var(--gold);
+  text-shadow: 0 0 8px rgba(200,146,42,0.3);
+}
+.item-id-link .ext { font-size: 0.48rem; opacity: 0.6; }
+
+.item-input {
+  background: rgba(0,0,0,0.35);
+  border: 1px solid var(--stone-border);
+  border-radius: 2px;
+  color: var(--parchment);
+  font-family: 'IM Fell English', serif;
+  font-size: 0.75rem;
+  padding: 4px 7px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+.item-input:focus { border-color: var(--gold-dim); }
+.item-input.amount {
+  width: 60px;
+  color: var(--gold);
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  text-align: center;
+}
+
+.crest-pill {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.62rem;
+  color: #9a6aba;
+  background: rgba(90,58,122,0.1);
+  border: 1px solid rgba(90,58,122,0.25);
+  border-radius: 2px;
+  padding: 2px 7px;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── TAGS ── */
+.tag {
+  display: inline-block;
+  font-family: 'Cinzel', serif;
+  font-size: 0.52rem;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  padding: 2px 7px;
+  border-radius: 1px;
+}
+.tag-blue {
+  background: rgba(26,42,70,0.6);
+  color: #7aabcc;
+  border: 1px solid rgba(60,100,140,0.4);
+}
+.tag-orange {
+  background: rgba(80,30,10,0.6);
+  color: var(--gold);
+  border: 1px solid rgba(139,70,26,0.4);
+}
+.tag-purple {
+  background: rgba(60,30,80,0.6);
+  color: #9a6aba;
+  border: 1px solid rgba(90,50,120,0.4);
+}
+
+/* ── TOOLTIP ── */
+.ref-tooltip {
+  position: fixed;
+  z-index: 5000;
+  background: linear-gradient(180deg, #1e1810 0%, #161208 100%);
+  border: 1px solid var(--gold-dim);
+  border-radius: 2px;
+  padding: 12px 14px;
+  width: 220px;
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.8),
+    0 0 20px rgba(200,146,42,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+  /* Corner ornaments via outline */
+}
+.ref-tooltip::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(200,146,42,0.08);
+  border-radius: 1px;
+  pointer-events: none;
+}
+.ref-tooltip.visible { opacity: 1; }
+
+.tt-icon {
+  width: 44px; height: 44px;
+  border-radius: 2px;
+  border: 1px solid var(--stone-border);
+  background: rgba(0,0,0,0.5);
+  object-fit: contain;
+  display: block;
+  margin-bottom: 8px;
+  image-rendering: pixelated;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+.tt-icon-ph {
+  width: 44px; height: 44px;
+  border-radius: 2px;
+  border: 1px solid var(--stone-border);
+  background: rgba(0,0,0,0.5);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+.tt-name {
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--parchment);
+  line-height: 1.4;
+  margin-bottom: 4px;
+  letter-spacing: 0.3px;
+}
+.tt-id {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.62rem;
+  color: var(--gold-dim);
+  margin-bottom: 8px;
+}
+.tt-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--stone-border), transparent);
+  margin: 8px 0;
+}
+.tt-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.62rem;
+  color: var(--ref);
+  text-decoration: none;
+}
+.tt-link:hover { color: var(--sage-bright); }
+
+/* ── WELCOME SCREEN ── */
+.welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  gap: 22px;
+  text-align: center;
+  padding: 50px 40px;
+}
+
+/* Large decorative dragon crest SVG above title */
+.welcome-crest {
+  font-size: 3rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 20px rgba(200,146,42,0.3));
+  opacity: 0.85;
+}
+
+.welcome-title {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--gold-bright);
+  text-shadow:
+    0 0 40px rgba(232,200,74,0.35),
+    0 2px 6px rgba(0,0,0,0.9);
+  letter-spacing: 6px;
+  line-height: 1.2;
+}
+
+/* Ornamental rule under title */
+.welcome-rule {
+  width: 300px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), var(--gold), var(--gold-dim), transparent);
+  position: relative;
+}
+.welcome-rule::before {
+  content: '✦';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--stone-deep);
+  padding: 0 8px;
+  color: var(--gold);
+  font-size: 0.6rem;
+}
+
+.welcome-sub {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  color: var(--parchment-dim);
+  font-size: 0.88rem;
+  max-width: 420px;
+  line-height: 1.7;
+}
+
+.welcome-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-width: 440px;
+  width: 100%;
+}
+
+.welcome-stat {
+  background: linear-gradient(180deg, #1c1610 0%, #18130e 100%);
+  border: 1px solid var(--stone-border);
+  border-top: 2px solid var(--gold-dim);
+  border-radius: 2px;
+  padding: 14px 10px;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+.welcome-stat .val {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.5rem;
+  color: var(--gold-bright);
+  text-shadow: 0 0 20px rgba(232,200,74,0.3);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.welcome-stat .lbl {
+  font-family: 'Cinzel', serif;
+  font-size: 0.52rem;
+  color: var(--parchment-faint);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.ref-integration-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(74,107,74,0.07);
+  border: 1px solid rgba(74,107,74,0.25);
+  border-radius: 2px;
+  padding: 8px 16px;
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.72rem;
+  color: var(--ref);
+}
+
+.drop-zone {
+  border: 1px dashed var(--stone-border);
+  border-radius: 2px;
+  padding: 28px 50px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.82rem;
+  color: var(--parchment-faint);
+  background: rgba(0,0,0,0.2);
+}
+.drop-zone:hover,
+.drop-zone.drag-over {
+  border-color: var(--gold-dim);
+  color: var(--gold-dim);
+  background: rgba(200,146,42,0.04);
+  box-shadow: 0 0 20px rgba(200,146,42,0.08);
+}
+
+/* ── SEPARATOR ── */
+.separator {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--stone-border), transparent);
+  margin: 14px 0;
+}
+
+.pool-section, .base-section { margin-bottom: 16px; }
+
+/* ── MODALS ── */
+.modal { display: none; }
+.modal.open { display: flex; }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.82);
+  backdrop-filter: blur(3px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-box {
+  background: linear-gradient(180deg, #1e1810 0%, #18130e 100%);
+  border: 1px solid var(--gold-dim);
+  border-radius: 2px;
+  box-shadow:
+    0 0 60px rgba(0,0,0,0.9),
+    0 0 30px rgba(200,146,42,0.1),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+  padding: 24px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 82vh;
+  overflow-y: auto;
+  position: relative;
+}
+/* inner inset frame */
+.modal-box::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(200,146,42,0.07);
+  border-radius: 1px;
+  pointer-events: none;
+}
+
+.modal-title {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gold-bright);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  text-shadow: 0 0 15px rgba(232,200,74,0.3);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--stone-border);
+}
+
+.modal-footer {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid var(--stone-border);
+}
+
+.modal-item-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--stone-border);
+  border-radius: 2px;
+  margin-top: 6px;
+}
+.modal-preview-icon {
+  width: 36px; height: 36px;
+  border-radius: 2px;
+  border: 1px solid var(--stone-border);
+  background: rgba(0,0,0,0.5);
+  object-fit: contain;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--stone-deep); }
+::-webkit-scrollbar-thumb {
+  background: var(--stone-border);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(180deg, #1e1810 0%, #18130e 100%);
+  border: 1px solid var(--sage);
+  border-radius: 2px;
+  padding: 10px 16px;
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--sage-bright);
+  z-index: 9000;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6), 0 0 12px rgba(74,107,74,0.2);
+  animation: toastIn 0.2s ease;
+}
+.toast.error {
+  border-color: var(--crimson);
+  color: #c87070;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6), var(--crimsn-glow);
+}
+@keyframes toastIn {
+  from { transform: translateX(110%); opacity: 0; }
+  to   { transform: translateX(0);   opacity: 1; }
+}
+
+/* empty appraisals state */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  color: var(--parchment-faint);
+  font-size: 0.82rem;
+}
+.empty-state::before {
+  content: '✦ ';
+  color: var(--gold-dim);
+}
+.empty-state::after {
+  content: ' ✦';
+  color: var(--gold-dim);
+}
+
 </style>
 </head>
 <body>
 
+<!-- ═══ HEADER ═══════════════════════════════════════════ -->
 <header>
-  <h1>⚔ DDON Shop Editor</h1>
-  <span class="header-badge">↗ reference.dd-on.com integrated</span>
+  <h1>DDON Shop Editor</h1>
+  <span class="header-badge">↗ reference.dd-on.com</span>
+  <div class="header-divider"></div>
   <div class="header-actions">
-    <button class="btn btn-ghost btn-sm" onclick="loadFile()">📂 Load JSON</button>
-    <button class="btn btn-gold btn-sm" onclick="exportJSON()">💾 Export JSON</button>
-    <button class="btn btn-purple btn-sm" onclick="exportCSV()">📊 Export CSV</button>
+    <button class="btn btn-ghost btn-sm" onclick="loadFile()">Load JSON</button>
+    <button class="btn btn-gold btn-sm" onclick="exportJSON()">Export JSON</button>
+    <button class="btn btn-purple btn-sm" onclick="exportCSV()">Export CSV</button>
     <button class="btn btn-success btn-sm" onclick="addCategory()">+ Category</button>
     <button class="btn btn-primary btn-sm" onclick="addAppraisal()">+ Appraisal</button>
   </div>
 </header>
 
+<!-- ═══ LAYOUT ════════════════════════════════════════════ -->
 <div class="layout">
+
+  <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-header">
-      <span class="sidebar-title">SHOP TREE</span>
-      <button class="btn btn-ghost btn-sm" onclick="addShop()">+</button>
+      <span class="sidebar-title">Shop Ledger</span>
+      <button class="btn btn-ghost btn-sm" onclick="addShop()" title="Add Shop">+</button>
     </div>
     <div class="tree" id="tree"></div>
   </div>
 
+  <!-- Main -->
   <div class="main">
     <div class="main-toolbar">
-      <div class="breadcrumb" id="breadcrumb">Load a JSON file to begin</div>
+      <div class="breadcrumb" id="breadcrumb">Load a scroll to begin</div>
       <div class="search-box">
-        <span style="color:var(--text2)">🔍</span>
-        <input type="text" id="searchInput" placeholder="Search appraisals..." oninput="filterAppraisals()">
+        <span style="color:var(--parchment-faint);font-size:0.75rem">⚔</span>
+        <input type="text" id="searchInput" placeholder="Search appraisals…" oninput="filterAppraisals()">
       </div>
     </div>
     <div class="content-area" id="contentArea">
       <div class="welcome">
-        <div class="welcome-title">SHOP EDITOR</div>
-        <div class="welcome-sub">Load your exchange shop JSON. Item icons and details are pulled live from <strong style="color:var(--ref)">reference.dd-on.com</strong> — hover any item for a preview, click its ID to open the reference page.</div>
-        <div class="ref-integration-badge">🔗 Hover items for icons &amp; stats · Click item ID to open reference page</div>
+        <div class="welcome-crest">🐉</div>
+        <div class="welcome-title">Shop Editor</div>
+        <div class="welcome-rule"></div>
+        <div class="welcome-sub">
+          Load an exchange shop scroll to begin. Item icons and lore are drawn
+          from <strong style="color:var(--ref);font-style:normal">reference.dd-on.com</strong>
+          — hover any item to inspect it, or click its number to open the full entry.
+        </div>
+        <div class="ref-integration-badge">
+          ✦ Hover items for icons &amp; details · Click Item ID to open reference page
+        </div>
         <div class="drop-zone" id="dropZone" onclick="loadFile()">
-          Click to load JSON file<br>
-          <small style="opacity:0.5">or drag &amp; drop</small>
+          Click to load a JSON scroll<br>
+          <small style="opacity:0.55;font-size:0.7rem">or drag &amp; drop the file here</small>
         </div>
         <div class="welcome-grid" id="statsGrid" style="display:none"></div>
       </div>
@@ -441,7 +1188,7 @@
   </div>
 </div>
 
-<!-- Hover tooltip -->
+<!-- ═══ TOOLTIP ══════════════════════════════════════════ -->
 <div class="ref-tooltip" id="refTooltip">
   <div id="ttIconWrap"></div>
   <div class="tt-name" id="ttName">—</div>
@@ -450,22 +1197,22 @@
   <a class="tt-link" id="ttLink" href="#" target="_blank">↗ View on reference.dd-on.com</a>
 </div>
 
-<!-- Add Item Modal -->
+<!-- ═══ ADD ITEM MODAL ═══════════════════════════════════ -->
 <div class="modal" id="addItemModal">
   <div class="modal-overlay">
     <div class="modal-box">
-      <div class="modal-title">ADD ITEM</div>
-      <div style="display:flex;flex-direction:column;gap:11px">
+      <div class="modal-title">Add Item to Ledger</div>
+      <div style="display:flex;flex-direction:column;gap:13px">
         <div class="field-group">
           <span class="field-label">Item ID</span>
           <input class="field-input" id="newItemId" type="number" placeholder="e.g. 16800" oninput="previewModalItem()">
         </div>
         <div id="modalItemPreview" style="display:none" class="modal-item-preview">
           <img class="modal-preview-icon" id="modalPreviewIcon" src="" alt="" style="display:none">
-          <div id="modalPreviewIconPh" style="width:36px;height:36px;border-radius:3px;border:1px solid var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">⏳</div>
+          <div id="modalPreviewIconPh" style="width:36px;height:36px;border-radius:2px;border:1px solid var(--stone-border);background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">⏳</div>
           <div>
-            <div id="modalPreviewName" style="font-size:0.75rem;font-weight:600;margin-bottom:3px">Loading...</div>
-            <a id="modalPreviewLink" href="#" target="_blank" style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--ref);text-decoration:none">↗ reference.dd-on.com</a>
+            <div id="modalPreviewName" style="font-family:'Cinzel',serif;font-size:0.7rem;font-weight:600;color:var(--parchment);margin-bottom:4px">Loading…</div>
+            <a id="modalPreviewLink" href="#" target="_blank" style="font-family:'IM Fell English',serif;font-style:italic;font-size:0.62rem;color:var(--ref);text-decoration:none">↗ reference.dd-on.com</a>
           </div>
         </div>
         <div class="field-group">
@@ -478,19 +1225,19 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-ghost" onclick="closeModal('addItemModal')">Cancel</button>
-        <button class="btn btn-primary" onclick="confirmAddItem()">Add Item</button>
+        <button class="btn btn-ghost" onclick="closeModal('addItemModal')">Dismiss</button>
+        <button class="btn btn-primary" onclick="confirmAddItem()">Add to Ledger</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Add Appraisal Modal -->
+<!-- ═══ ADD APPRAISAL MODAL ══════════════════════════════ -->
 <div class="modal" id="addAppraisalModal">
   <div class="modal-overlay">
     <div class="modal-box">
-      <div class="modal-title">ADD APPRAISAL</div>
-      <div style="display:flex;flex-direction:column;gap:11px">
+      <div class="modal-title">New Appraisal Entry</div>
+      <div style="display:flex;flex-direction:column;gap:13px">
         <div class="field-group">
           <span class="field-label">Label</span>
           <input class="field-input" id="newApprLabel" placeholder="e.g. &lt;Exch&gt; Dragon Ring">
@@ -501,19 +1248,19 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-ghost" onclick="closeModal('addAppraisalModal')">Cancel</button>
-        <button class="btn btn-primary" onclick="confirmAddAppraisal()">Add</button>
+        <button class="btn btn-ghost" onclick="closeModal('addAppraisalModal')">Dismiss</button>
+        <button class="btn btn-primary" onclick="confirmAddAppraisal()">Inscribe</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Add Category Modal -->
+<!-- ═══ ADD CATEGORY MODAL ═══════════════════════════════ -->
 <div class="modal" id="addCategoryModal">
   <div class="modal-overlay">
     <div class="modal-box">
-      <div class="modal-title">ADD CATEGORY</div>
-      <div style="display:flex;flex-direction:column;gap:11px">
+      <div class="modal-title">New Category</div>
+      <div style="display:flex;flex-direction:column;gap:13px">
         <div class="field-group">
           <span class="field-label">Shop</span>
           <select class="field-input" id="newCatShopIdx"></select>
@@ -528,8 +1275,8 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-ghost" onclick="closeModal('addCategoryModal')">Cancel</button>
-        <button class="btn btn-primary" onclick="confirmAddCategory()">Add</button>
+        <button class="btn btn-ghost" onclick="closeModal('addCategoryModal')">Dismiss</button>
+        <button class="btn btn-primary" onclick="confirmAddCategory()">Inscribe</button>
       </div>
     </div>
   </div>
@@ -537,6 +1284,9 @@
 
 <input type="file" id="fileInput" accept=".json" style="display:none" onchange="handleFileLoad(event)">
 
+<!-- ═══════════════════════════════════════════════════════
+     ALL LOGIC — unchanged from previous version
+═══════════════════════════════════════════════════════ -->
 <script>
 // ── Constants ──────────────────────────────────────────────
 const REF_BASE  = 'https://reference.dd-on.com/build';
@@ -551,11 +1301,8 @@ let G = {
   expandedApprs: new Set(),
 };
 
-// icon cache: itemId -> url string | 'NONE' | 'LOADING'
 const iconCache = {};
-// name cache: itemId -> display name from reference page
 const nameCache = {};
-// fetch queue (serial, polite)
 let fetchQ = Promise.resolve();
 
 // ── URL helpers ────────────────────────────────────────────
@@ -571,10 +1318,8 @@ async function resolveItem(itemId) {
     const resp = await fetch(refPageUrl(itemId), { mode: 'cors' });
     if (!resp.ok) { iconCache[itemId] = 'NONE'; return; }
     const html = await resp.text();
-    // Icon
     const iconMatch = html.match(/images\/icons\/large\/(ii\d+\.png)/i);
     iconCache[itemId] = iconMatch ? `${ICON_BASE}/${iconMatch[1]}` : 'NONE';
-    // Name (h2 contains "Items / Category / Name")
     const nameMatch = html.match(/<h2[^>]*>Items\s*\/[^\/]+\/\s*([^<]+)<\/h2>/i);
     if (nameMatch) nameCache[itemId] = nameMatch[1].trim();
   } catch {
@@ -583,11 +1328,10 @@ async function resolveItem(itemId) {
 }
 
 function queueResolve(itemId) {
-  if (iconCache[itemId] !== undefined) return; // already resolving or done
+  if (iconCache[itemId] !== undefined) return;
   iconCache[itemId] = 'LOADING';
   fetchQ = fetchQ.then(async () => {
     await resolveItem(itemId);
-    // Patch live DOM
     const iconUrl = iconCache[itemId];
     document.querySelectorAll(`[data-iid="${itemId}"]`).forEach(el => {
       applyIconToEl(el, itemId, iconUrl);
@@ -622,8 +1366,8 @@ function handleFileLoad(e) {
   const f = e.target.files[0]; if (!f) return;
   const r = new FileReader();
   r.onload = ev => {
-    try { initData(JSON.parse(ev.target.result)); toast('Loaded: ' + f.name); }
-    catch(err) { toast('Invalid JSON: ' + err.message, true); }
+    try { initData(JSON.parse(ev.target.result)); toast('Scroll loaded: ' + f.name); }
+    catch(err) { toast('Invalid scroll: ' + err.message, true); }
   };
   r.readAsText(f);
   e.target.value = '';
@@ -652,7 +1396,7 @@ function renderTree() {
     return `<div class="tree-shop">
       <div class="tree-shop-header ${G.selShop===si&&G.selCat===null?'active':''}" onclick="toggleShop(${si})">
         <span class="tree-chevron ${exp?'open':''}">▶</span>
-        <span class="tree-shop-label">SHOP ${si} · T${s.shop_type||'?'}</span>
+        <span class="tree-shop-label">Shop ${si} · T${s.shop_type||'?'}</span>
         <span class="count-badge">${cats.length}</span>
       </div>
       <div class="tree-categories ${exp?'open':''}">
@@ -662,8 +1406,8 @@ function renderTree() {
             <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1" title="${esc(c.label||'')}">${esc(c.label||'(unnamed)')}</span>
             <span class="count-badge">${(c.appraisals||[]).length}</span>
           </div>`).join('')}
-        <div style="padding:4px 6px">
-          <button class="btn btn-ghost btn-sm" style="width:100%;font-size:0.6rem"
+        <div style="padding:5px 8px">
+          <button class="btn btn-ghost btn-sm" style="width:100%;font-size:0.58rem"
             onclick="addCatToShop(${si},event)">+ Add Category</button>
         </div>
       </div>
@@ -691,9 +1435,14 @@ function showWelcome() {
   shops.forEach(s => { cats += (s.categories||[]).length; (s.categories||[]).forEach(c => apprs += (c.appraisals||[]).length); });
   document.getElementById('contentArea').innerHTML = `
     <div class="welcome">
-      <div class="welcome-title">SHOP EDITOR</div>
-      <div class="welcome-sub">File loaded — select a category from the sidebar. Icons &amp; item data load automatically from <strong style="color:var(--ref)">reference.dd-on.com</strong>.</div>
-      <div class="ref-integration-badge">🔗 Hover items for icon &amp; stats · Click ID to open reference page · Icons load on demand</div>
+      <div class="welcome-crest">🐉</div>
+      <div class="welcome-title">Shop Editor</div>
+      <div class="welcome-rule"></div>
+      <div class="welcome-sub">
+        Scroll loaded — select a category from the ledger at left.
+        Item icons are drawn from <strong style="color:var(--ref);font-style:normal">reference.dd-on.com</strong>.
+      </div>
+      <div class="ref-integration-badge">✦ Hover items for icons · Click ID to open reference page</div>
       <div class="welcome-grid">
         <div class="welcome-stat"><div class="val">${shops.length}</div><div class="lbl">Shops</div></div>
         <div class="welcome-stat"><div class="val">${cats}</div><div class="lbl">Categories</div></div>
@@ -707,7 +1456,7 @@ function renderCat() {
   if (G.selShop === null || G.selCat === null) return;
   const cat = getCat();
   document.getElementById('breadcrumb').innerHTML =
-    `Shop <span>${G.selShop}</span> <span style="margin:0 5px;opacity:0.35">›</span> <span>${esc(cat.label||'(unnamed)')}</span>`;
+    `Shop <span>${G.selShop}</span> <span style="margin:0 6px;opacity:0.3">✦</span> <span>${esc(cat.label||'(unnamed)')}</span>`;
 
   document.getElementById('contentArea').innerHTML = `
     <div class="cat-info-panel">
@@ -721,9 +1470,9 @@ function renderCat() {
           <input class="field-input" value="${escAttr(cat.comment||'')}" oninput="updCatField('comment',this.value)">
         </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
+      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
         <button class="btn btn-primary btn-sm" onclick="addAppraisalToCat()">+ Appraisal</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteCat()">🗑 Delete</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteCat()">✕ Delete</button>
       </div>
     </div>
     <div class="appraisal-grid" id="appraisalGrid">
@@ -731,15 +1480,13 @@ function renderCat() {
     </div>`;
 
   filterAppraisals();
-
-  // Queue icon fetches for all items in this category
   (cat.appraisals||[]).forEach(a => {
     [...(a.base_items||[]), ...(a.pool||[])].forEach(item => queueResolve(item.item_id));
   });
 }
 
 function renderApprs(list) {
-  if (!list.length) return `<div style="text-align:center;padding:60px;color:var(--text2);font-family:'Share Tech Mono',monospace;font-size:0.72rem">No appraisals — click + Appraisal above</div>`;
+  if (!list.length) return `<div class="empty-state">No appraisals inscribed — add one above</div>`;
   return list.map((a,ai) => renderCard(a, ai)).join('');
 }
 
@@ -769,25 +1516,25 @@ function renderCard(a, ai) {
         </div>
 
         <div class="base-section">
-          <div class="section-label">⬡ Cost Items (base_items)</div>
+          <div class="section-label">Cost Items — base_items</div>
           <table class="item-table">
-            <thead><tr><th style="width:40px"></th><th>Item ID</th><th>Name</th><th style="width:70px">Amt</th><th style="width:36px"></th></tr></thead>
+            <thead><tr><th style="width:40px"></th><th>Item ID</th><th>Name</th><th style="width:70px">Amount</th><th style="width:36px"></th></tr></thead>
             <tbody>${base.map((item,ii)=>itemRow(ai,'base_items',item,ii,false)).join('')}</tbody>
           </table>
           <button class="btn btn-ghost btn-sm" onclick="openAddItem(${ai},'base_items')">+ Add Cost Item</button>
         </div>
 
         <div class="pool-section">
-          <div class="section-label">⬢ Reward Pool (pool)</div>
+          <div class="section-label">Reward Pool — pool</div>
           <table class="item-table">
-            <thead><tr><th style="width:40px"></th><th>Item ID</th><th>Name</th><th style="width:70px">Amt</th><th>Crests</th><th style="width:36px"></th></tr></thead>
+            <thead><tr><th style="width:40px"></th><th>Item ID</th><th>Name</th><th style="width:70px">Amount</th><th>Crests</th><th style="width:36px"></th></tr></thead>
             <tbody>${pool.map((item,ii)=>itemRow(ai,'pool',item,ii,true)).join('')}</tbody>
           </table>
           <button class="btn btn-ghost btn-sm" onclick="openAddItem(${ai},'pool')">+ Add Pool Item</button>
         </div>
 
         <div class="separator"></div>
-        <button class="btn btn-ghost btn-sm" onclick="dupeAppr(${ai})">⧉ Duplicate</button>
+        <button class="btn btn-ghost btn-sm" onclick="dupeAppr(${ai})">⧉ Duplicate Appraisal</button>
       </div>
     </div>`;
 }
@@ -844,7 +1591,6 @@ function showTooltip(e, itemId) {
   const idEl = document.getElementById('ttId');
   const linkEl = document.getElementById('ttLink');
 
-  // Find name from DOM input nearest the hovered element
   const row = e.currentTarget.closest('tr');
   const nameInput = row ? row.querySelector('input.item-input') : null;
   const displayName = nameCache[itemId] || (nameInput ? nameInput.value : '') || `Item #${itemId}`;
@@ -853,20 +1599,17 @@ function showTooltip(e, itemId) {
   idEl.textContent = `ID: ${itemId}`;
   linkEl.href = refPageUrl(itemId);
 
-  // Icon
   const cached = iconCache[itemId];
   if (cached && cached !== 'NONE' && cached !== 'LOADING') {
     wrap.innerHTML = `<img class="tt-icon" src="${cached}" alt="">`;
   } else {
     wrap.innerHTML = `<div class="tt-icon-ph">🗡️</div>`;
-    // Resolve and update tooltip if still visible
     resolveItem(itemId).then(() => {
       const url = iconCache[itemId];
       if (url && url !== 'NONE' && tip.classList.contains('visible')) {
         wrap.innerHTML = `<img class="tt-icon" src="${url}" alt="">`;
         if (nameCache[itemId]) nameEl.textContent = nameCache[itemId];
       }
-      // Patch page icons
       document.querySelectorAll(`.item-icon-placeholder[data-iid="${itemId}"]`).forEach(el => applyIconToEl(el, itemId, url));
     });
   }
@@ -880,7 +1623,7 @@ function hideTooltip() {
 }
 
 function positionTip(e, tip) {
-  const m = 14, tw = 215, th = 150;
+  const m = 14, tw = 220, th = 155;
   let x = e.clientX + m, y = e.clientY + m;
   if (x + tw > window.innerWidth  - 10) x = e.clientX - tw - m;
   if (y + th > window.innerHeight - 10) y = e.clientY - th - m;
@@ -896,13 +1639,8 @@ function toggleAppr(ai) {
   renderCat();
 }
 
-function updCatField(f, v) {
-  getCat()[f] = v;
-  renderTree();
-}
-
+function updCatField(f, v) { getCat()[f] = v; renderTree(); }
 function updApprField(ai, f, v) { getCat().appraisals[ai][f] = v; }
-
 function updItem(ai, sec, ii, f, v) { getCat().appraisals[ai][sec][ii][f] = v; }
 
 function removeItem(ai, sec, ii) {
@@ -912,11 +1650,11 @@ function removeItem(ai, sec, ii) {
 
 function deleteAppr(ai, e) {
   e.stopPropagation();
-  if (!confirm('Delete this appraisal?')) return;
+  if (!confirm('Remove this appraisal from the ledger?')) return;
   getCat().appraisals.splice(ai, 1);
   G.expandedApprs = new Set();
   renderCat();
-  toast('Appraisal deleted');
+  toast('Appraisal removed');
 }
 
 function dupeAppr(ai) {
@@ -930,13 +1668,13 @@ function dupeAppr(ai) {
 }
 
 function deleteCat() {
-  if (!confirm('Delete this entire category?')) return;
+  if (!confirm('Remove this entire category from the ledger?')) return;
   G.data.shops[G.selShop].categories.splice(G.selCat, 1);
   G.selCat = null;
   renderTree();
   showWelcome();
-  document.getElementById('breadcrumb').textContent = 'Select a category from the sidebar';
-  toast('Category deleted');
+  document.getElementById('breadcrumb').textContent = 'Select a category from the ledger';
+  toast('Category removed');
 }
 
 // ── Add item modal ──────────────────────────────────────────
@@ -965,7 +1703,6 @@ async function previewModalItem() {
   const url = iconCache[id];
   const name = nameCache[id];
 
-  // auto-fill name if field is empty
   if (name && !document.getElementById('newItemName').value) {
     document.getElementById('newItemName').value = name;
   }
@@ -983,12 +1720,12 @@ function confirmAddItem() {
   const id = parseInt(document.getElementById('newItemId').value);
   const name = document.getElementById('newItemName').value.trim();
   const amt = parseInt(document.getElementById('newItemAmt').value)||1;
-  if (!id||!name) { toast('ID and Name required', true); return; }
+  if (!id||!name) { toast('ID and Name are required', true); return; }
   getCat().appraisals[_addCtx.ai][_addCtx.sec].push({ item_id:id, name, amount:amt });
   closeModal('addItemModal');
   renderCat();
   queueResolve(id);
-  toast('Item added');
+  toast('Item inscribed to ledger');
 }
 
 // ── Add appraisal ───────────────────────────────────────────
@@ -1004,12 +1741,12 @@ function addAppraisal() {
 function confirmAddAppraisal() {
   const label = document.getElementById('newApprLabel').value.trim();
   const comment = document.getElementById('newApprComment').value.trim();
-  if (!label) { toast('Label required', true); return; }
+  if (!label) { toast('Label is required', true); return; }
   getCat().appraisals.push({ label, ...(comment?{comment}:{}), base_items:[], pool:[] });
   G.expandedApprs.add(getCat().appraisals.length - 1);
   closeModal('addAppraisalModal');
   renderCat();
-  toast('Appraisal added');
+  toast('Appraisal inscribed');
 }
 
 // ── Add category ─────────────────────────────────────────────
@@ -1022,7 +1759,7 @@ function populateCatModal(defaultShop) {
   document.getElementById('addCategoryModal').classList.add('open');
 }
 function addCategory() {
-  if (!G.data) { toast('Load a file first', true); return; }
+  if (!G.data) { toast('Load a scroll first', true); return; }
   populateCatModal(G.selShop !== null ? G.selShop : 0);
 }
 function addCatToShop(si, e) {
@@ -1034,22 +1771,22 @@ function confirmAddCategory() {
   const si = parseInt(document.getElementById('newCatShopIdx').value);
   const label = document.getElementById('newCatLabel').value.trim();
   const comment = document.getElementById('newCatComment').value.trim();
-  if (!label) { toast('Label required', true); return; }
+  if (!label) { toast('Label is required', true); return; }
   G.data.shops[si].categories.push({ label, ...(comment?{comment}:{}), appraisals:[] });
   G.expandedShops.add(si);
   closeModal('addCategoryModal');
   renderTree();
-  toast('Category added');
+  toast('Category inscribed');
 }
 
 function addShop() {
-  if (!G.data) { toast('Load a file first', true); return; }
+  if (!G.data) { toast('Load a scroll first', true); return; }
   const type = prompt('Shop type number (e.g. 25):');
   if (!type) return;
   G.data.shops.push({ shop_type: type, categories: [] });
   G.expandedShops.add(G.data.shops.length - 1);
   renderTree();
-  toast('Shop added');
+  toast('Shop added to ledger');
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
@@ -1064,13 +1801,13 @@ function filterAppraisals() {
 
 // ── Export ───────────────────────────────────────────────────
 function exportJSON() {
-  if (!G.data) { toast('No data', true); return; }
+  if (!G.data) { toast('No scroll loaded', true); return; }
   dl('SpecialShops_edited.json', JSON.stringify(G.data, null, 2), 'application/json');
-  toast('JSON exported');
+  toast('Scroll exported as JSON');
 }
 
 function exportCSV() {
-  if (!G.data) { toast('No data', true); return; }
+  if (!G.data) { toast('No scroll loaded', true); return; }
   const rows = [['Shop','Shop Type','Category','Cat Comment','Appraisal','Appr Comment','Type','Item ID','Name','Amount','Crests','Reference URL']];
   G.data.shops.forEach((s,si) => {
     (s.categories||[]).forEach(cat => {
@@ -1089,7 +1826,7 @@ function exportCSV() {
   });
   const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
   dl('SpecialShops.csv', csv, 'text/csv');
-  toast('CSV exported — '+(rows.length-1)+' rows');
+  toast('Scroll exported as CSV — '+(rows.length-1)+' rows');
 }
 
 function dl(name, content, mime) {
@@ -1109,7 +1846,7 @@ function toast(msg, err=false) {
   document.querySelector('.toast')?.remove();
   const el = Object.assign(document.createElement('div'), { className:'toast'+(err?' error':''), textContent:msg });
   document.body.appendChild(el);
-  _toastT = setTimeout(()=>el.remove(), 3000);
+  _toastT = setTimeout(()=>el.remove(), 3200);
 }
 
 // ── Drag & Drop ───────────────────────────────────────────────
@@ -1121,19 +1858,19 @@ if (dz) {
     e.preventDefault(); dz.classList.remove('drag-over');
     const f = e.dataTransfer.files[0]; if(!f) return;
     const r = new FileReader();
-    r.onload = ev=>{try{initData(JSON.parse(ev.target.result));toast('Loaded: '+f.name);}catch{toast('Invalid JSON',true);}};
+    r.onload = ev=>{try{initData(JSON.parse(ev.target.result));toast('Scroll loaded: '+f.name);}catch{toast('Invalid scroll',true);}};
     r.readAsText(f);
   });
 }
 
-// ── Modal close on overlay click ──────────────────────────────
+// ── Modal overlay close ───────────────────────────────────────
 document.querySelectorAll('.modal').forEach(m=>{
   m.querySelector('.modal-overlay')?.addEventListener('click',function(e){
     if(e.target===this) m.classList.remove('open');
   });
 });
 
-// Ctrl+S to export
+// Ctrl+S
 document.addEventListener('keydown', e=>{
   if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();exportJSON();}
 });
