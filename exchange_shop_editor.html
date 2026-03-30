@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DDON Exchange Shop Editor</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap');
+
+  :root {
+    --bg: #0a0c10;
+    --bg2: #10131a;
+    --bg3: #161b26;
+    --border: #1e2a3a;
+    --accent: #00c8ff;
+    --accent2: #ff6b35;
+    --accent3: #a855f7;
+    --gold: #f5c842;
+    --green: #22c55e;
+    --red: #ef4444;
+    --text: #c8d8e8;
+    --text2: #6b8099;
+    --panel: #0d1117;
+    --ref: #34d399;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,200,255,0.012) 2px, rgba(0,200,255,0.012) 4px);
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  header {
+    background: linear-gradient(135deg, #060a10 0%, #0d1420 100%);
+    border-bottom: 1px solid var(--accent);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 0 40px rgba(0,200,255,0.12);
+    position: sticky; top: 0; z-index: 100;
+    flex-wrap: wrap;
+  }
+
+  header h1 {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 1rem;
+    color: var(--accent);
+    text-shadow: 0 0 20px rgba(0,200,255,0.5);
+    letter-spacing: 3px;
+    white-space: nowrap;
+  }
+
+  .header-badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--ref);
+    background: rgba(52,211,153,0.08);
+    border: 1px solid rgba(52,211,153,0.3);
+    padding: 2px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .header-actions { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .btn {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 5px 12px;
+    border: 1px solid;
+    border-radius: 4px;
+    cursor: pointer;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
+  .btn-primary:hover { background: #33d4ff; }
+  .btn-danger { background: transparent; border-color: var(--red); color: var(--red); }
+  .btn-danger:hover { background: rgba(239,68,68,0.15); }
+  .btn-success { background: transparent; border-color: var(--green); color: var(--green); }
+  .btn-success:hover { background: rgba(34,197,94,0.15); }
+  .btn-ghost { background: transparent; border-color: var(--border); color: var(--text2); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-gold { background: transparent; border-color: var(--gold); color: var(--gold); }
+  .btn-gold:hover { background: rgba(245,200,66,0.1); }
+  .btn-purple { background: transparent; border-color: var(--accent3); color: var(--accent3); }
+  .btn-purple:hover { background: rgba(168,85,247,0.1); }
+  .btn-sm { padding: 3px 9px; font-size: 0.65rem; }
+
+  .layout { display: flex; height: calc(100vh - 52px); }
+
+  .sidebar {
+    width: 270px;
+    min-width: 270px;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-header {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg2);
+  }
+  .sidebar-title { font-family: 'Orbitron', monospace; font-size: 0.6rem; color: var(--accent); letter-spacing: 2px; flex: 1; }
+
+  .tree { overflow-y: auto; flex: 1; padding: 6px; }
+
+  .tree-shop { margin-bottom: 4px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+
+  .tree-shop-header {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 10px; background: var(--bg2);
+    cursor: pointer; user-select: none; transition: background 0.15s;
+  }
+  .tree-shop-header:hover { background: var(--bg3); }
+  .tree-shop-header.active { background: rgba(0,200,255,0.08); border-left: 2px solid var(--accent); }
+  .tree-shop-label { font-family: 'Orbitron', monospace; font-size: 0.58rem; color: var(--accent); letter-spacing: 1px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tree-chevron { font-size: 0.58rem; color: var(--text2); transition: transform 0.2s; }
+  .tree-chevron.open { transform: rotate(90deg); }
+
+  .tree-categories { display: none; padding: 4px; }
+  .tree-categories.open { display: block; }
+
+  .tree-cat {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 8px; margin-bottom: 2px; border-radius: 3px;
+    cursor: pointer; font-size: 0.7rem; color: var(--text2);
+    transition: all 0.15s; border: 1px solid transparent;
+  }
+  .tree-cat:hover { color: var(--text); background: var(--bg3); }
+  .tree-cat.active { color: var(--gold); background: rgba(245,200,66,0.08); border-color: rgba(245,200,66,0.2); }
+  .tree-cat-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+  .tree-cat.active .tree-cat-dot { background: var(--gold); box-shadow: 0 0 5px var(--gold); }
+  .count-badge { margin-left: auto; font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: var(--text2); background: var(--bg); padding: 1px 5px; border-radius: 2px; flex-shrink: 0; }
+
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .main-toolbar {
+    padding: 8px 14px; background: var(--bg2); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .breadcrumb { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: var(--text2); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .breadcrumb span { color: var(--accent); }
+
+  .search-box {
+    display: flex; align-items: center; background: var(--bg3);
+    border: 1px solid var(--border); border-radius: 4px; padding: 4px 10px; gap: 6px;
+  }
+  .search-box input { background: none; border: none; outline: none; color: var(--text); font-family: 'Exo 2', sans-serif; font-size: 0.73rem; width: 160px; }
+  .search-box input::placeholder { color: var(--text2); }
+
+  .content-area { flex: 1; overflow-y: auto; padding: 14px; }
+
+  .cat-info-panel {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 12px 14px; margin-bottom: 14px; display: flex; align-items: flex-start; gap: 12px;
+  }
+  .cat-info-fields { flex: 1; display: flex; gap: 10px; flex-wrap: wrap; }
+  .field-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 160px; }
+  .field-label { font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: var(--text2); letter-spacing: 1px; text-transform: uppercase; }
+  .field-input {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text); font-family: 'Exo 2', sans-serif; font-size: 0.78rem;
+    padding: 5px 9px; outline: none; transition: border-color 0.15s;
+  }
+  .field-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,200,255,0.08); }
+
+  .appraisal-grid { display: flex; flex-direction: column; gap: 10px; }
+
+  .appraisal-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+    overflow: hidden; transition: border-color 0.15s;
+  }
+  .appraisal-card:hover { border-color: rgba(0,200,255,0.25); }
+
+  .appraisal-header {
+    display: flex; align-items: center; gap: 8px; padding: 9px 12px;
+    background: var(--bg3); cursor: pointer; user-select: none; border-bottom: 1px solid var(--border);
+  }
+  .appraisal-toggle { font-size: 0.65rem; color: var(--text2); transition: transform 0.2s; flex-shrink: 0; }
+  .appraisal-toggle.open { transform: rotate(90deg); }
+  .appraisal-label-text { flex: 1; font-weight: 600; font-size: 0.8rem; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .appraisal-body { padding: 14px; display: none; }
+  .appraisal-body.open { display: block; }
+  .appraisal-meta { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+
+  .section-label {
+    font-family: 'Orbitron', monospace; font-size: 0.58rem; color: var(--accent2);
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;
+    padding-bottom: 4px; border-bottom: 1px solid rgba(255,107,53,0.25);
+  }
+
+  .item-table { width: 100%; border-collapse: collapse; font-size: 0.76rem; margin-bottom: 10px; }
+  .item-table th {
+    font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: var(--text2);
+    text-align: left; padding: 5px 7px; border-bottom: 1px solid var(--border);
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .item-table td { padding: 5px 7px; border-bottom: 1px solid rgba(30,42,58,0.5); vertical-align: middle; }
+  .item-table tr:last-child td { border-bottom: none; }
+  .item-table tr:hover td { background: rgba(255,255,255,0.015); }
+
+  .item-icon-cell { width: 38px; text-align: center; padding: 4px 6px !important; }
+
+  .item-icon {
+    width: 32px; height: 32px; border-radius: 3px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    object-fit: contain;
+    display: block;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s;
+    image-rendering: pixelated;
+  }
+  .item-icon:hover { border-color: var(--accent); transform: scale(1.15); }
+
+  .item-icon-placeholder {
+    width: 32px; height: 32px; border-radius: 3px;
+    border: 1px solid var(--border); background: var(--bg3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.5rem; color: var(--text2); cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    transition: border-color 0.15s;
+    user-select: none;
+  }
+  .item-icon-placeholder:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .item-id-link {
+    font-family: 'Share Tech Mono', monospace; color: var(--accent); font-size: 0.7rem;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 3px;
+    transition: color 0.15s;
+  }
+  .item-id-link:hover { color: var(--ref); }
+  .item-id-link .ext { font-size: 0.5rem; opacity: 0.55; }
+
+  .item-amount { font-family: 'Share Tech Mono', monospace; color: var(--gold); }
+
+  .item-input {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 3px;
+    color: var(--text); font-family: 'Exo 2', sans-serif; font-size: 0.73rem;
+    padding: 4px 6px; outline: none; width: 100%; transition: border-color 0.15s;
+  }
+  .item-input:focus { border-color: var(--accent); }
+  .item-input.amount { width: 60px; font-family: 'Share Tech Mono', monospace; color: var(--gold); }
+
+  .crest-pill {
+    display: inline-flex; align-items: center;
+    font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: var(--accent3);
+    background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.2);
+    border-radius: 10px; padding: 2px 7px; max-width: 150px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  /* Reference tooltip */
+  .ref-tooltip {
+    position: fixed;
+    z-index: 5000;
+    background: var(--bg2);
+    border: 1px solid var(--ref);
+    border-radius: 8px;
+    padding: 12px;
+    width: 215px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.65), 0 0 24px rgba(52,211,153,0.12);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s;
+  }
+  .ref-tooltip.visible { opacity: 1; }
+
+  .tt-icon {
+    width: 48px; height: 48px;
+    border-radius: 4px; border: 1px solid var(--border);
+    background: var(--bg3); object-fit: contain;
+    display: block; margin-bottom: 8px;
+    image-rendering: pixelated;
+  }
+  .tt-icon-ph {
+    width: 48px; height: 48px;
+    border-radius: 4px; border: 1px solid var(--border);
+    background: var(--bg3); margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+  }
+  .tt-name { font-weight: 600; font-size: 0.78rem; color: var(--text); line-height: 1.3; margin-bottom: 3px; }
+  .tt-id { font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; color: var(--accent); margin-bottom: 6px; }
+  .tt-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+    color: var(--ref); text-decoration: none; border-bottom: 1px dotted rgba(52,211,153,0.4);
+  }
+  .tt-divider { height: 1px; background: var(--border); margin: 8px 0; }
+  .tt-stat { display: flex; justify-content: space-between; font-size: 0.68rem; margin-bottom: 2px; }
+  .tt-stat-lbl { color: var(--text2); }
+  .tt-stat-val { color: var(--text); font-family: 'Share Tech Mono', monospace; }
+
+  /* Welcome */
+  .welcome {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-height: 100%; gap: 18px; text-align: center; padding: 40px;
+  }
+  .welcome-title { font-family: 'Orbitron', monospace; font-size: 1.3rem; color: var(--accent); text-shadow: 0 0 30px rgba(0,200,255,0.35); letter-spacing: 4px; }
+  .welcome-sub { color: var(--text2); font-size: 0.82rem; max-width: 420px; line-height: 1.6; }
+  .welcome-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 460px; width: 100%; }
+  .welcome-stat { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 12px; text-align: center; }
+  .welcome-stat .val { font-family: 'Orbitron', monospace; font-size: 1.3rem; color: var(--gold); }
+  .welcome-stat .lbl { font-size: 0.62rem; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; }
+  .ref-integration-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.25);
+    border-radius: 6px; padding: 8px 14px; font-size: 0.72rem; color: var(--ref);
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .drop-zone {
+    border: 2px dashed var(--border); border-radius: 8px; padding: 28px 44px;
+    cursor: pointer; transition: all 0.2s; font-size: 0.78rem; color: var(--text2);
+  }
+  .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); color: var(--accent); background: rgba(0,200,255,0.04); }
+
+  /* Modals */
+  .modal { display: none; }
+  .modal.open { display: flex; }
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.72);
+    backdrop-filter: blur(4px); z-index: 1000;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-box {
+    background: var(--bg2); border: 1px solid var(--accent); border-radius: 8px;
+    box-shadow: 0 0 60px rgba(0,200,255,0.18); padding: 22px;
+    width: 100%; max-width: 500px; max-height: 82vh; overflow-y: auto;
+  }
+  .modal-title { font-family: 'Orbitron', monospace; font-size: 0.8rem; color: var(--accent); letter-spacing: 2px; margin-bottom: 18px; text-transform: uppercase; }
+  .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+
+  .tag { display: inline-block; font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; padding: 2px 6px; border-radius: 3px; }
+  .tag-blue { background: rgba(0,200,255,0.12); color: var(--accent); border: 1px solid rgba(0,200,255,0.25); }
+  .tag-orange { background: rgba(255,107,53,0.12); color: var(--accent2); border: 1px solid rgba(255,107,53,0.25); }
+  .tag-purple { background: rgba(168,85,247,0.12); color: var(--accent3); border: 1px solid rgba(168,85,247,0.25); }
+
+  .separator { height: 1px; background: var(--border); margin: 12px 0; }
+  .pool-section, .base-section { margin-bottom: 14px; }
+
+  .modal-item-preview {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; background: var(--bg3);
+    border: 1px solid var(--border); border-radius: 4px; margin-top: 6px;
+  }
+  .modal-preview-icon {
+    width: 36px; height: 36px; border-radius: 3px;
+    border: 1px solid var(--border); background: var(--bg2);
+    object-fit: contain; flex-shrink: 0;
+    image-rendering: pixelated;
+  }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text2); }
+
+  .toast {
+    position: fixed; bottom: 18px; right: 18px;
+    background: var(--bg2); border: 1px solid var(--green); border-radius: 6px;
+    padding: 9px 14px; font-size: 0.75rem; color: var(--green);
+    font-family: 'Share Tech Mono', monospace; z-index: 9000;
+    animation: slideIn 0.2s ease; box-shadow: 0 0 20px rgba(34,197,94,0.15);
+  }
+  .toast.error { border-color: var(--red); color: var(--red); box-shadow: 0 0 20px rgba(239,68,68,0.15); }
+  @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚔ DDON Shop Editor</h1>
+  <span class="header-badge">↗ reference.dd-on.com integrated</span>
+  <div class="header-actions">
+    <button class="btn btn-ghost btn-sm" onclick="loadFile()">📂 Load JSON</button>
+    <button class="btn btn-gold btn-sm" onclick="exportJSON()">💾 Export JSON</button>
+    <button class="btn btn-purple btn-sm" onclick="exportCSV()">📊 Export CSV</button>
+    <button class="btn btn-success btn-sm" onclick="addCategory()">+ Category</button>
+    <button class="btn btn-primary btn-sm" onclick="addAppraisal()">+ Appraisal</button>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-title">SHOP TREE</span>
+      <button class="btn btn-ghost btn-sm" onclick="addShop()">+</button>
+    </div>
+    <div class="tree" id="tree"></div>
+  </div>
+
+  <div class="main">
+    <div class="main-toolbar">
+      <div class="breadcrumb" id="breadcrumb">Load a JSON file to begin</div>
+      <div class="search-box">
+        <span style="color:var(--text2)">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search appraisals..." oninput="filterAppraisals()">
+      </div>
+    </div>
+    <div class="content-area" id="contentArea">
+      <div class="welcome">
+        <div class="welcome-title">SHOP EDITOR</div>
+        <div class="welcome-sub">Load your exchange shop JSON. Item icons and details are pulled live from <strong style="color:var(--ref)">reference.dd-on.com</strong> — hover any item for a preview, click its ID to open the reference page.</div>
+        <div class="ref-integration-badge">🔗 Hover items for icons &amp; stats · Click item ID to open reference page</div>
+        <div class="drop-zone" id="dropZone" onclick="loadFile()">
+          Click to load JSON file<br>
+          <small style="opacity:0.5">or drag &amp; drop</small>
+        </div>
+        <div class="welcome-grid" id="statsGrid" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hover tooltip -->
+<div class="ref-tooltip" id="refTooltip">
+  <div id="ttIconWrap"></div>
+  <div class="tt-name" id="ttName">—</div>
+  <div class="tt-id" id="ttId">ID: —</div>
+  <div class="tt-divider"></div>
+  <a class="tt-link" id="ttLink" href="#" target="_blank">↗ View on reference.dd-on.com</a>
+</div>
+
+<!-- Add Item Modal -->
+<div class="modal" id="addItemModal">
+  <div class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">ADD ITEM</div>
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <div class="field-group">
+          <span class="field-label">Item ID</span>
+          <input class="field-input" id="newItemId" type="number" placeholder="e.g. 16800" oninput="previewModalItem()">
+        </div>
+        <div id="modalItemPreview" style="display:none" class="modal-item-preview">
+          <img class="modal-preview-icon" id="modalPreviewIcon" src="" alt="" style="display:none">
+          <div id="modalPreviewIconPh" style="width:36px;height:36px;border-radius:3px;border:1px solid var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">⏳</div>
+          <div>
+            <div id="modalPreviewName" style="font-size:0.75rem;font-weight:600;margin-bottom:3px">Loading...</div>
+            <a id="modalPreviewLink" href="#" target="_blank" style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--ref);text-decoration:none">↗ reference.dd-on.com</a>
+          </div>
+        </div>
+        <div class="field-group">
+          <span class="field-label">Item Name</span>
+          <input class="field-input" id="newItemName" placeholder="e.g. Dragon Skill Ring">
+        </div>
+        <div class="field-group">
+          <span class="field-label">Amount</span>
+          <input class="field-input" id="newItemAmt" type="number" value="1" min="1">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('addItemModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmAddItem()">Add Item</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Appraisal Modal -->
+<div class="modal" id="addAppraisalModal">
+  <div class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">ADD APPRAISAL</div>
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <div class="field-group">
+          <span class="field-label">Label</span>
+          <input class="field-input" id="newApprLabel" placeholder="e.g. &lt;Exch&gt; Dragon Ring">
+        </div>
+        <div class="field-group">
+          <span class="field-label">Comment (optional)</span>
+          <input class="field-input" id="newApprComment" placeholder="Japanese name or note">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('addAppraisalModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmAddAppraisal()">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Category Modal -->
+<div class="modal" id="addCategoryModal">
+  <div class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">ADD CATEGORY</div>
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <div class="field-group">
+          <span class="field-label">Shop</span>
+          <select class="field-input" id="newCatShopIdx"></select>
+        </div>
+        <div class="field-group">
+          <span class="field-label">Label</span>
+          <input class="field-input" id="newCatLabel" placeholder="e.g. Dragon Festival">
+        </div>
+        <div class="field-group">
+          <span class="field-label">Comment (optional)</span>
+          <input class="field-input" id="newCatComment" placeholder="Japanese label">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('addCategoryModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmAddCategory()">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept=".json" style="display:none" onchange="handleFileLoad(event)">
+
+<script>
+// ── Constants ──────────────────────────────────────────────
+const REF_BASE  = 'https://reference.dd-on.com/build';
+const ICON_BASE = REF_BASE + '/images/icons/large';
+
+// ── State ──────────────────────────────────────────────────
+let G = {
+  data: null,
+  selShop: null,
+  selCat: null,
+  expandedShops: new Set(),
+  expandedApprs: new Set(),
+};
+
+// icon cache: itemId -> url string | 'NONE' | 'LOADING'
+const iconCache = {};
+// name cache: itemId -> display name from reference page
+const nameCache = {};
+// fetch queue (serial, polite)
+let fetchQ = Promise.resolve();
+
+// ── URL helpers ────────────────────────────────────────────
+function refPageUrl(id) {
+  return `${REF_BASE}/i${String(id).padStart(8,'0')}.html`;
+}
+
+// ── Icon fetching ──────────────────────────────────────────
+async function resolveItem(itemId) {
+  if (iconCache[itemId] !== undefined && iconCache[itemId] !== 'LOADING') return;
+  iconCache[itemId] = 'LOADING';
+  try {
+    const resp = await fetch(refPageUrl(itemId), { mode: 'cors' });
+    if (!resp.ok) { iconCache[itemId] = 'NONE'; return; }
+    const html = await resp.text();
+    // Icon
+    const iconMatch = html.match(/images\/icons\/large\/(ii\d+\.png)/i);
+    iconCache[itemId] = iconMatch ? `${ICON_BASE}/${iconMatch[1]}` : 'NONE';
+    // Name (h2 contains "Items / Category / Name")
+    const nameMatch = html.match(/<h2[^>]*>Items\s*\/[^\/]+\/\s*([^<]+)<\/h2>/i);
+    if (nameMatch) nameCache[itemId] = nameMatch[1].trim();
+  } catch {
+    iconCache[itemId] = 'NONE';
+  }
+}
+
+function queueResolve(itemId) {
+  if (iconCache[itemId] !== undefined) return; // already resolving or done
+  iconCache[itemId] = 'LOADING';
+  fetchQ = fetchQ.then(async () => {
+    await resolveItem(itemId);
+    // Patch live DOM
+    const iconUrl = iconCache[itemId];
+    document.querySelectorAll(`[data-iid="${itemId}"]`).forEach(el => {
+      applyIconToEl(el, itemId, iconUrl);
+    });
+    await sleep(60);
+  });
+}
+
+function applyIconToEl(el, itemId, iconUrl) {
+  if (el.classList.contains('item-icon-placeholder')) {
+    if (iconUrl && iconUrl !== 'NONE') {
+      const img = document.createElement('img');
+      img.className = 'item-icon';
+      img.src = iconUrl;
+      img.alt = '';
+      img.dataset.iid = itemId;
+      img.onmouseenter = ev => showTooltip(ev, itemId);
+      img.onmouseleave = hideTooltip;
+      el.replaceWith(img);
+    }
+  } else if (el.tagName === 'IMG' && !el.src) {
+    if (iconUrl && iconUrl !== 'NONE') el.src = iconUrl;
+  }
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── File loading ────────────────────────────────────────────
+function loadFile() { document.getElementById('fileInput').click(); }
+
+function handleFileLoad(e) {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try { initData(JSON.parse(ev.target.result)); toast('Loaded: ' + f.name); }
+    catch(err) { toast('Invalid JSON: ' + err.message, true); }
+  };
+  r.readAsText(f);
+  e.target.value = '';
+}
+
+function initData(parsed) {
+  G.data = Array.isArray(parsed) ? { shops: parsed } : { ...parsed };
+  if (!G.data.shops) G.data.shops = [];
+  G.data.shops.forEach(s => {
+    if (!s.categories) s.categories = [];
+    s.categories.forEach(c => { if (!c.appraisals) c.appraisals = []; });
+  });
+  G.selShop = null; G.selCat = null;
+  G.expandedShops = new Set();
+  G.expandedApprs = new Set();
+  renderTree();
+  showWelcome();
+}
+
+// ── Tree ────────────────────────────────────────────────────
+function renderTree() {
+  if (!G.data) return;
+  document.getElementById('tree').innerHTML = G.data.shops.map((s, si) => {
+    const exp = G.expandedShops.has(si);
+    const cats = s.categories || [];
+    return `<div class="tree-shop">
+      <div class="tree-shop-header ${G.selShop===si&&G.selCat===null?'active':''}" onclick="toggleShop(${si})">
+        <span class="tree-chevron ${exp?'open':''}">▶</span>
+        <span class="tree-shop-label">SHOP ${si} · T${s.shop_type||'?'}</span>
+        <span class="count-badge">${cats.length}</span>
+      </div>
+      <div class="tree-categories ${exp?'open':''}">
+        ${cats.map((c,ci)=>`
+          <div class="tree-cat ${G.selShop===si&&G.selCat===ci?'active':''}" onclick="selectCat(${si},${ci})">
+            <span class="tree-cat-dot"></span>
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1" title="${esc(c.label||'')}">${esc(c.label||'(unnamed)')}</span>
+            <span class="count-badge">${(c.appraisals||[]).length}</span>
+          </div>`).join('')}
+        <div style="padding:4px 6px">
+          <button class="btn btn-ghost btn-sm" style="width:100%;font-size:0.6rem"
+            onclick="addCatToShop(${si},event)">+ Add Category</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleShop(si) {
+  G.expandedShops.has(si) ? G.expandedShops.delete(si) : G.expandedShops.add(si);
+  renderTree();
+}
+
+function selectCat(si, ci) {
+  G.selShop = si; G.selCat = ci;
+  G.expandedShops.add(si);
+  G.expandedApprs = new Set();
+  renderTree();
+  renderCat();
+}
+
+// ── Welcome ─────────────────────────────────────────────────
+function showWelcome() {
+  const shops = G.data.shops;
+  let cats=0, apprs=0;
+  shops.forEach(s => { cats += (s.categories||[]).length; (s.categories||[]).forEach(c => apprs += (c.appraisals||[]).length); });
+  document.getElementById('contentArea').innerHTML = `
+    <div class="welcome">
+      <div class="welcome-title">SHOP EDITOR</div>
+      <div class="welcome-sub">File loaded — select a category from the sidebar. Icons &amp; item data load automatically from <strong style="color:var(--ref)">reference.dd-on.com</strong>.</div>
+      <div class="ref-integration-badge">🔗 Hover items for icon &amp; stats · Click ID to open reference page · Icons load on demand</div>
+      <div class="welcome-grid">
+        <div class="welcome-stat"><div class="val">${shops.length}</div><div class="lbl">Shops</div></div>
+        <div class="welcome-stat"><div class="val">${cats}</div><div class="lbl">Categories</div></div>
+        <div class="welcome-stat"><div class="val">${apprs}</div><div class="lbl">Appraisals</div></div>
+      </div>
+    </div>`;
+}
+
+// ── Category render ─────────────────────────────────────────
+function renderCat() {
+  if (G.selShop === null || G.selCat === null) return;
+  const cat = getCat();
+  document.getElementById('breadcrumb').innerHTML =
+    `Shop <span>${G.selShop}</span> <span style="margin:0 5px;opacity:0.35">›</span> <span>${esc(cat.label||'(unnamed)')}</span>`;
+
+  document.getElementById('contentArea').innerHTML = `
+    <div class="cat-info-panel">
+      <div class="cat-info-fields">
+        <div class="field-group">
+          <span class="field-label">Label</span>
+          <input class="field-input" value="${escAttr(cat.label||'')}" oninput="updCatField('label',this.value)">
+        </div>
+        <div class="field-group">
+          <span class="field-label">Comment / JP</span>
+          <input class="field-input" value="${escAttr(cat.comment||'')}" oninput="updCatField('comment',this.value)">
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
+        <button class="btn btn-primary btn-sm" onclick="addAppraisalToCat()">+ Appraisal</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteCat()">🗑 Delete</button>
+      </div>
+    </div>
+    <div class="appraisal-grid" id="appraisalGrid">
+      ${renderApprs(cat.appraisals||[])}
+    </div>`;
+
+  filterAppraisals();
+
+  // Queue icon fetches for all items in this category
+  (cat.appraisals||[]).forEach(a => {
+    [...(a.base_items||[]), ...(a.pool||[])].forEach(item => queueResolve(item.item_id));
+  });
+}
+
+function renderApprs(list) {
+  if (!list.length) return `<div style="text-align:center;padding:60px;color:var(--text2);font-family:'Share Tech Mono',monospace;font-size:0.72rem">No appraisals — click + Appraisal above</div>`;
+  return list.map((a,ai) => renderCard(a, ai)).join('');
+}
+
+function renderCard(a, ai) {
+  const open = G.expandedApprs.has(ai);
+  const base = a.base_items || [];
+  const pool = a.pool || [];
+  return `
+    <div class="appraisal-card" data-label="${escAttr((a.label||'').toLowerCase())}">
+      <div class="appraisal-header" onclick="toggleAppr(${ai})">
+        <span class="appraisal-toggle ${open?'open':''}">▶</span>
+        <span class="appraisal-label-text">${esc(a.label||'(unnamed)')}</span>
+        <span class="tag tag-blue">${base.length} cost</span>
+        <span class="tag tag-orange">${pool.length} reward</span>
+        <button class="btn btn-danger btn-sm" onclick="deleteAppr(${ai},event)" style="margin-left:4px">✕</button>
+      </div>
+      <div class="appraisal-body ${open?'open':''}">
+        <div class="appraisal-meta">
+          <div class="field-group" style="flex:2;min-width:190px">
+            <span class="field-label">Label</span>
+            <input class="field-input" value="${escAttr(a.label||'')}" oninput="updApprField(${ai},'label',this.value)" style="font-size:0.73rem">
+          </div>
+          <div class="field-group" style="flex:2;min-width:190px">
+            <span class="field-label">Comment</span>
+            <input class="field-input" value="${escAttr(a.comment||'')}" oninput="updApprField(${ai},'comment',this.value)" style="font-size:0.73rem">
+          </div>
+        </div>
+
+        <div class="base-section">
+          <div class="section-label">⬡ Cost Items (base_items)</div>
+          <table class="item-table">
+            <thead><tr><th style="width:40px"></th><th>Item ID</th><th>Name</th><th style="width:70px">Amt</th><th style="width:36px"></th></tr></thead>
+            <tbody>${base.map((item,ii)=>itemRow(ai,'base_items',item,ii,false)).join('')}</tbody>
+          </table>
+          <button class="btn btn-ghost btn-sm" onclick="openAddItem(${ai},'base_items')">+ Add Cost Item</button>
+        </div>
+
+        <div class="pool-section">
+          <div class="section-label">⬢ Reward Pool (pool)</div>
+          <table class="item-table">
+            <thead><tr><th style="width:40px"></th><th>Item ID</th><th>Name</th><th style="width:70px">Amt</th><th>Crests</th><th style="width:36px"></th></tr></thead>
+            <tbody>${pool.map((item,ii)=>itemRow(ai,'pool',item,ii,true)).join('')}</tbody>
+          </table>
+          <button class="btn btn-ghost btn-sm" onclick="openAddItem(${ai},'pool')">+ Add Pool Item</button>
+        </div>
+
+        <div class="separator"></div>
+        <button class="btn btn-ghost btn-sm" onclick="dupeAppr(${ai})">⧉ Duplicate</button>
+      </div>
+    </div>`;
+}
+
+function itemRow(ai, section, item, ii, showCrests) {
+  const id = item.item_id;
+  const cachedIcon = iconCache[id];
+  const iconHtml = (cachedIcon && cachedIcon !== 'NONE' && cachedIcon !== 'LOADING')
+    ? `<img class="item-icon" src="${cachedIcon}" alt="" data-iid="${id}"
+           onmouseenter="showTooltip(event,${id})" onmouseleave="hideTooltip()">`
+    : `<div class="item-icon-placeholder" data-iid="${id}"
+           onmouseenter="showTooltip(event,${id})" onmouseleave="hideTooltip()">?</div>`;
+
+  const crestCell = showCrests
+    ? `<td>${item.crests?`<span class="crest-pill" title="${escAttr(JSON.stringify(item.crests))}">${fmtCrest(item.crests)}</span>`:'—'}</td>`
+    : '';
+
+  return `<tr>
+    <td class="item-icon-cell">${iconHtml}</td>
+    <td>
+      <a class="item-id-link" href="${refPageUrl(id)}" target="_blank"
+         onmouseenter="showTooltip(event,${id})" onmouseleave="hideTooltip()">
+        ${id}<span class="ext">↗</span>
+      </a>
+    </td>
+    <td><input class="item-input" value="${escAttr(item.name||'')}"
+         oninput="updItem(${ai},'${section}',${ii},'name',this.value)"
+         style="min-width:150px"></td>
+    <td><input class="item-input amount" value="${item.amount}"
+         oninput="updItem(${ai},'${section}',${ii},'amount',+this.value)"></td>
+    ${crestCell}
+    <td><button class="btn btn-danger btn-sm" onclick="removeItem(${ai},'${section}',${ii})">✕</button></td>
+  </tr>`;
+}
+
+function fmtCrest(crests) {
+  if (!crests||!crests.length) return '—';
+  const c = crests[0];
+  if (c.type==='CrestLottery') return `Lottery(${c.values?c.values.length:0})`;
+  if (c.type==='Imbued') return `Imbued #${c.crest_id}`;
+  if (c.type==='DragonTrinketAlpha') return `DTα ${c.job_id||''}`;
+  if (c.type==='DragonTrinketBeta') return `DTβ ${c.job_id||''}`;
+  return c.type||'?';
+}
+
+// ── Tooltip ─────────────────────────────────────────────────
+let tipTimer;
+
+function showTooltip(e, itemId) {
+  clearTimeout(tipTimer);
+  const tip = document.getElementById('refTooltip');
+  const wrap = document.getElementById('ttIconWrap');
+  const nameEl = document.getElementById('ttName');
+  const idEl = document.getElementById('ttId');
+  const linkEl = document.getElementById('ttLink');
+
+  // Find name from DOM input nearest the hovered element
+  const row = e.currentTarget.closest('tr');
+  const nameInput = row ? row.querySelector('input.item-input') : null;
+  const displayName = nameCache[itemId] || (nameInput ? nameInput.value : '') || `Item #${itemId}`;
+
+  nameEl.textContent = displayName;
+  idEl.textContent = `ID: ${itemId}`;
+  linkEl.href = refPageUrl(itemId);
+
+  // Icon
+  const cached = iconCache[itemId];
+  if (cached && cached !== 'NONE' && cached !== 'LOADING') {
+    wrap.innerHTML = `<img class="tt-icon" src="${cached}" alt="">`;
+  } else {
+    wrap.innerHTML = `<div class="tt-icon-ph">🗡️</div>`;
+    // Resolve and update tooltip if still visible
+    resolveItem(itemId).then(() => {
+      const url = iconCache[itemId];
+      if (url && url !== 'NONE' && tip.classList.contains('visible')) {
+        wrap.innerHTML = `<img class="tt-icon" src="${url}" alt="">`;
+        if (nameCache[itemId]) nameEl.textContent = nameCache[itemId];
+      }
+      // Patch page icons
+      document.querySelectorAll(`.item-icon-placeholder[data-iid="${itemId}"]`).forEach(el => applyIconToEl(el, itemId, url));
+    });
+  }
+
+  positionTip(e, tip);
+  tip.classList.add('visible');
+}
+
+function hideTooltip() {
+  tipTimer = setTimeout(() => document.getElementById('refTooltip').classList.remove('visible'), 100);
+}
+
+function positionTip(e, tip) {
+  const m = 14, tw = 215, th = 150;
+  let x = e.clientX + m, y = e.clientY + m;
+  if (x + tw > window.innerWidth  - 10) x = e.clientX - tw - m;
+  if (y + th > window.innerHeight - 10) y = e.clientY - th - m;
+  tip.style.left = x + 'px';
+  tip.style.top  = y + 'px';
+}
+
+// ── Editing helpers ─────────────────────────────────────────
+function getCat() { return G.data.shops[G.selShop].categories[G.selCat]; }
+
+function toggleAppr(ai) {
+  G.expandedApprs.has(ai) ? G.expandedApprs.delete(ai) : G.expandedApprs.add(ai);
+  renderCat();
+}
+
+function updCatField(f, v) {
+  getCat()[f] = v;
+  renderTree();
+}
+
+function updApprField(ai, f, v) { getCat().appraisals[ai][f] = v; }
+
+function updItem(ai, sec, ii, f, v) { getCat().appraisals[ai][sec][ii][f] = v; }
+
+function removeItem(ai, sec, ii) {
+  getCat().appraisals[ai][sec].splice(ii, 1);
+  renderCat();
+}
+
+function deleteAppr(ai, e) {
+  e.stopPropagation();
+  if (!confirm('Delete this appraisal?')) return;
+  getCat().appraisals.splice(ai, 1);
+  G.expandedApprs = new Set();
+  renderCat();
+  toast('Appraisal deleted');
+}
+
+function dupeAppr(ai) {
+  const cat = getCat();
+  const clone = JSON.parse(JSON.stringify(cat.appraisals[ai]));
+  clone.label = (clone.label||'') + ' (copy)';
+  cat.appraisals.splice(ai+1, 0, clone);
+  G.expandedApprs.add(ai+1);
+  renderCat();
+  toast('Appraisal duplicated');
+}
+
+function deleteCat() {
+  if (!confirm('Delete this entire category?')) return;
+  G.data.shops[G.selShop].categories.splice(G.selCat, 1);
+  G.selCat = null;
+  renderTree();
+  showWelcome();
+  document.getElementById('breadcrumb').textContent = 'Select a category from the sidebar';
+  toast('Category deleted');
+}
+
+// ── Add item modal ──────────────────────────────────────────
+let _addCtx = {};
+
+function openAddItem(ai, sec) {
+  _addCtx = { ai, sec };
+  document.getElementById('newItemId').value = '';
+  document.getElementById('newItemName').value = '';
+  document.getElementById('newItemAmt').value = '1';
+  document.getElementById('modalItemPreview').style.display = 'none';
+  document.getElementById('addItemModal').classList.add('open');
+}
+
+async function previewModalItem() {
+  const id = parseInt(document.getElementById('newItemId').value);
+  const prev = document.getElementById('modalItemPreview');
+  if (!id) { prev.style.display = 'none'; return; }
+  prev.style.display = 'flex';
+  document.getElementById('modalPreviewName').textContent = `Item #${id}`;
+  document.getElementById('modalPreviewLink').href = refPageUrl(id);
+  document.getElementById('modalPreviewIcon').style.display = 'none';
+  document.getElementById('modalPreviewIconPh').style.display = 'flex';
+
+  await resolveItem(id);
+  const url = iconCache[id];
+  const name = nameCache[id];
+
+  // auto-fill name if field is empty
+  if (name && !document.getElementById('newItemName').value) {
+    document.getElementById('newItemName').value = name;
+  }
+  document.getElementById('modalPreviewName').textContent = name || `Item #${id}`;
+
+  if (url && url !== 'NONE') {
+    const img = document.getElementById('modalPreviewIcon');
+    img.src = url;
+    img.style.display = 'block';
+    document.getElementById('modalPreviewIconPh').style.display = 'none';
+  }
+}
+
+function confirmAddItem() {
+  const id = parseInt(document.getElementById('newItemId').value);
+  const name = document.getElementById('newItemName').value.trim();
+  const amt = parseInt(document.getElementById('newItemAmt').value)||1;
+  if (!id||!name) { toast('ID and Name required', true); return; }
+  getCat().appraisals[_addCtx.ai][_addCtx.sec].push({ item_id:id, name, amount:amt });
+  closeModal('addItemModal');
+  renderCat();
+  queueResolve(id);
+  toast('Item added');
+}
+
+// ── Add appraisal ───────────────────────────────────────────
+function addAppraisalToCat() {
+  document.getElementById('newApprLabel').value = '';
+  document.getElementById('newApprComment').value = '';
+  document.getElementById('addAppraisalModal').classList.add('open');
+}
+function addAppraisal() {
+  if (G.selShop===null||G.selCat===null) { toast('Select a category first', true); return; }
+  addAppraisalToCat();
+}
+function confirmAddAppraisal() {
+  const label = document.getElementById('newApprLabel').value.trim();
+  const comment = document.getElementById('newApprComment').value.trim();
+  if (!label) { toast('Label required', true); return; }
+  getCat().appraisals.push({ label, ...(comment?{comment}:{}), base_items:[], pool:[] });
+  G.expandedApprs.add(getCat().appraisals.length - 1);
+  closeModal('addAppraisalModal');
+  renderCat();
+  toast('Appraisal added');
+}
+
+// ── Add category ─────────────────────────────────────────────
+function populateCatModal(defaultShop) {
+  const sel = document.getElementById('newCatShopIdx');
+  sel.innerHTML = G.data.shops.map((s,i)=>`<option value="${i}">Shop ${i} (type ${s.shop_type||'?'})</option>`).join('');
+  if (defaultShop !== undefined) sel.value = defaultShop;
+  document.getElementById('newCatLabel').value = '';
+  document.getElementById('newCatComment').value = '';
+  document.getElementById('addCategoryModal').classList.add('open');
+}
+function addCategory() {
+  if (!G.data) { toast('Load a file first', true); return; }
+  populateCatModal(G.selShop !== null ? G.selShop : 0);
+}
+function addCatToShop(si, e) {
+  e.stopPropagation();
+  if (!G.data) return;
+  populateCatModal(si);
+}
+function confirmAddCategory() {
+  const si = parseInt(document.getElementById('newCatShopIdx').value);
+  const label = document.getElementById('newCatLabel').value.trim();
+  const comment = document.getElementById('newCatComment').value.trim();
+  if (!label) { toast('Label required', true); return; }
+  G.data.shops[si].categories.push({ label, ...(comment?{comment}:{}), appraisals:[] });
+  G.expandedShops.add(si);
+  closeModal('addCategoryModal');
+  renderTree();
+  toast('Category added');
+}
+
+function addShop() {
+  if (!G.data) { toast('Load a file first', true); return; }
+  const type = prompt('Shop type number (e.g. 25):');
+  if (!type) return;
+  G.data.shops.push({ shop_type: type, categories: [] });
+  G.expandedShops.add(G.data.shops.length - 1);
+  renderTree();
+  toast('Shop added');
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── Search ───────────────────────────────────────────────────
+function filterAppraisals() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  document.querySelectorAll('.appraisal-card').forEach(c => {
+    c.style.display = (!q||(c.dataset.label||'').includes(q)) ? '' : 'none';
+  });
+}
+
+// ── Export ───────────────────────────────────────────────────
+function exportJSON() {
+  if (!G.data) { toast('No data', true); return; }
+  dl('SpecialShops_edited.json', JSON.stringify(G.data, null, 2), 'application/json');
+  toast('JSON exported');
+}
+
+function exportCSV() {
+  if (!G.data) { toast('No data', true); return; }
+  const rows = [['Shop','Shop Type','Category','Cat Comment','Appraisal','Appr Comment','Type','Item ID','Name','Amount','Crests','Reference URL']];
+  G.data.shops.forEach((s,si) => {
+    (s.categories||[]).forEach(cat => {
+      (cat.appraisals||[]).forEach(a => {
+        const row = (item, type) => rows.push([
+          si, s.shop_type||'', cat.label||'', cat.comment||'',
+          a.label||'', a.comment||'', type,
+          item.item_id, item.name, item.amount,
+          item.crests ? JSON.stringify(item.crests) : '',
+          refPageUrl(item.item_id)
+        ]);
+        (a.base_items||[]).forEach(i=>row(i,'base_item'));
+        (a.pool||[]).forEach(i=>row(i,'pool_item'));
+      });
+    });
+  });
+  const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  dl('SpecialShops.csv', csv, 'text/csv');
+  toast('CSV exported — '+(rows.length-1)+' rows');
+}
+
+function dl(name, content, mime) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content],{type:mime}));
+  a.download = name; a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ── Utils ─────────────────────────────────────────────────────
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s) { return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+let _toastT;
+function toast(msg, err=false) {
+  clearTimeout(_toastT);
+  document.querySelector('.toast')?.remove();
+  const el = Object.assign(document.createElement('div'), { className:'toast'+(err?' error':''), textContent:msg });
+  document.body.appendChild(el);
+  _toastT = setTimeout(()=>el.remove(), 3000);
+}
+
+// ── Drag & Drop ───────────────────────────────────────────────
+const dz = document.getElementById('dropZone');
+if (dz) {
+  dz.addEventListener('dragover', e=>{e.preventDefault();dz.classList.add('drag-over');});
+  dz.addEventListener('dragleave',()=>dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e=>{
+    e.preventDefault(); dz.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = ev=>{try{initData(JSON.parse(ev.target.result));toast('Loaded: '+f.name);}catch{toast('Invalid JSON',true);}};
+    r.readAsText(f);
+  });
+}
+
+// ── Modal close on overlay click ──────────────────────────────
+document.querySelectorAll('.modal').forEach(m=>{
+  m.querySelector('.modal-overlay')?.addEventListener('click',function(e){
+    if(e.target===this) m.classList.remove('open');
+  });
+});
+
+// Ctrl+S to export
+document.addEventListener('keydown', e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();exportJSON();}
+});
+</script>
+</body>
+</html>
