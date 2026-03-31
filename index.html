@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DDON — Exchange Shop Editor</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
 <style>
 
 /* ═══════════════════════════════════════════════
@@ -68,7 +68,8 @@ body {
     ),
     linear-gradient(180deg, #100d09 0%, #0e0b08 100%);
   color: var(--parchment);
-  font-family: 'IM Fell English', Georgia, serif;
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 17px;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -111,14 +112,14 @@ header {
 /* Subtle top-left ornament */
 header::before {
   content: '✦';
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   color: var(--gold-dim);
   opacity: 0.5;
   flex-shrink: 0;
 }
 header::after {
   content: '✦';
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   color: var(--gold-dim);
   opacity: 0.5;
   flex-shrink: 0;
@@ -139,9 +140,9 @@ header h1 {
 }
 
 .header-badge {
-  font-family: 'IM Fell English', serif;
+  font-family: 'Crimson Pro', serif;
   font-style: italic;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   color: var(--ref);
   background: rgba(74,107,74,0.12);
   border: 1px solid rgba(74,107,74,0.3);
@@ -167,7 +168,7 @@ header h1 {
 /* ── BUTTONS ── */
 .btn {
   font-family: 'Cinzel', serif;
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 1.2px;
   text-transform: uppercase;
@@ -250,7 +251,7 @@ header h1 {
   box-shadow: 0 0 10px rgba(90,58,122,0.3);
 }
 
-.btn-sm { padding: 3px 9px; font-size: 0.58rem; }
+.btn-sm { padding: 3px 9px; font-size: 0.68rem; }
 
 /* ── LAYOUT ── */
 .layout {
@@ -284,7 +285,7 @@ header h1 {
 
 .sidebar-title {
   font-family: 'Cinzel', serif;
-  font-size: 0.58rem;
+  font-size: 0.68rem;
   font-weight: 700;
   color: var(--gold);
   letter-spacing: 3px;
@@ -330,7 +331,7 @@ header h1 {
 
 .tree-shop-label {
   font-family: 'Cinzel', serif;
-  font-size: 0.6rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: var(--gold);
   letter-spacing: 1px;
@@ -342,7 +343,7 @@ header h1 {
 }
 
 .tree-chevron {
-  font-size: 0.5rem;
+  font-size: 0.6rem;
   color: var(--gold-dim);
   transition: transform 0.2s;
 }
@@ -357,8 +358,8 @@ header h1 {
   gap: 7px;
   padding: 7px 12px;
   cursor: pointer;
-  font-family: 'IM Fell English', serif;
-  font-size: 0.72rem;
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.82rem;
   color: var(--parchment-dim);
   transition: all 0.15s;
   border-left: 2px solid transparent;
@@ -389,7 +390,7 @@ header h1 {
 .count-badge {
   margin-left: auto;
   font-family: 'Cinzel', serif;
-  font-size: 0.55rem;
+  font-size: 0.65rem;
   color: var(--parchment-faint);
   background: rgba(0,0,0,0.3);
   border: 1px solid var(--stone-border);
@@ -422,8 +423,8 @@ header h1 {
 }
 
 .breadcrumb {
-  font-family: 'IM Fell English', serif;
-  font-size: 0.72rem;
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.82rem;
   color: var(--parchment-dim);
   flex: 1;
   min-width: 0;
@@ -452,8 +453,8 @@ header h1 {
   border: none;
   outline: none;
   color: var(--parchment);
-  font-family: 'IM Fell English', serif;
-  font-size: 0.73rem;
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.83rem;
   width: 170px;
 }
 .search-box input::placeholder { color: var(--parchment-faint); font-style: italic; }
@@ -471,7 +472,7 @@ header h1 {
   gap: 10px;
   margin: 14px 0 10px;
   color: var(--gold-dim);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
 }
 .ornament-divider::before,
 .ornament-divider::after {
@@ -516,20 +517,21 @@ header h1 {
 
 .field-label {
   font-family: 'Cinzel', serif;
-  font-size: 0.55rem;
+  font-size: 0.65rem;
   font-weight: 700;
   color: var(--gold-dim);
   letter-spacing: 2px;
   text-transform: uppercase;
 }
 
-.field-input {
+.field-input,
+textarea.field-input {
   background: rgba(0,0,0,0.4);
   border: 1px solid var(--stone-border);
   border-radius: 2px;
   color: var(--parchment);
-  font-family: 'IM Fell English', serif;
-  font-size: 0.8rem;
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.9rem;
   padding: 6px 10px;
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
@@ -571,7 +573,7 @@ header h1 {
 }
 
 .appraisal-toggle {
-  font-size: 0.55rem;
+  font-size: 0.65rem;
   color: var(--gold-dim);
   transition: transform 0.2s;
   flex-shrink: 0;
@@ -581,7 +583,7 @@ header h1 {
 .appraisal-label-text {
   flex: 1;
   font-family: 'Cinzel', serif;
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--parchment);
   overflow: hidden;
@@ -597,7 +599,7 @@ header h1 {
 /* Section headers — styled like DD UI dividers */
 .section-label {
   font-family: 'Cinzel', serif;
-  font-size: 0.58rem;
+  font-size: 0.68rem;
   font-weight: 700;
   color: var(--gold);
   letter-spacing: 2.5px;
@@ -621,13 +623,13 @@ header h1 {
 .item-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.76rem;
+  font-size: 0.86rem;
   margin-bottom: 10px;
 }
 
 .item-table th {
   font-family: 'Cinzel', serif;
-  font-size: 0.52rem;
+  font-size: 0.62rem;
   font-weight: 700;
   color: var(--gold-dim);
   text-align: left;
@@ -677,10 +679,10 @@ header h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.6rem;
+  font-size: 0.7rem;
   color: var(--parchment-faint);
   cursor: pointer;
-  font-family: 'IM Fell English', serif;
+  font-family: 'Crimson Pro', serif;
   font-style: italic;
   transition: border-color 0.15s;
 }
@@ -691,7 +693,7 @@ header h1 {
 
 .item-id-link {
   font-family: 'Cinzel', serif;
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   color: var(--gold-dim);
   text-decoration: none;
   display: inline-flex;
@@ -704,15 +706,15 @@ header h1 {
   color: var(--gold);
   text-shadow: 0 0 8px rgba(200,146,42,0.3);
 }
-.item-id-link .ext { font-size: 0.48rem; opacity: 0.6; }
+.item-id-link .ext { font-size: 0.58rem; opacity: 0.6; }
 
 .item-input {
   background: rgba(0,0,0,0.35);
   border: 1px solid var(--stone-border);
   border-radius: 2px;
   color: var(--parchment);
-  font-family: 'IM Fell English', serif;
-  font-size: 0.75rem;
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.85rem;
   padding: 4px 7px;
   outline: none;
   width: 100%;
@@ -723,16 +725,16 @@ header h1 {
   width: 60px;
   color: var(--gold);
   font-family: 'Cinzel', serif;
-  font-size: 0.68rem;
+  font-size: 0.78rem;
   text-align: center;
 }
 
 .crest-pill {
   display: inline-flex;
   align-items: center;
-  font-family: 'IM Fell English', serif;
+  font-family: 'Crimson Pro', serif;
   font-style: italic;
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   color: #9a6aba;
   background: rgba(90,58,122,0.1);
   border: 1px solid rgba(90,58,122,0.25);
@@ -748,7 +750,7 @@ header h1 {
 .tag {
   display: inline-block;
   font-family: 'Cinzel', serif;
-  font-size: 0.52rem;
+  font-size: 0.62rem;
   font-weight: 600;
   letter-spacing: 0.8px;
   padding: 2px 7px;
@@ -822,7 +824,7 @@ header h1 {
 }
 .tt-name {
   font-family: 'Cinzel', serif;
-  font-size: 0.68rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: var(--parchment);
   line-height: 1.4;
@@ -830,9 +832,9 @@ header h1 {
   letter-spacing: 0.3px;
 }
 .tt-id {
-  font-family: 'IM Fell English', serif;
+  font-family: 'Crimson Pro', serif;
   font-style: italic;
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   color: var(--gold-dim);
   margin-bottom: 8px;
 }
@@ -845,9 +847,9 @@ header h1 {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-family: 'IM Fell English', serif;
+  font-family: 'Crimson Pro', serif;
   font-style: italic;
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   color: var(--ref);
   text-decoration: none;
 }
@@ -901,14 +903,14 @@ header h1 {
   background: var(--stone-deep);
   padding: 0 8px;
   color: var(--gold);
-  font-size: 0.6rem;
+  font-size: 0.7rem;
 }
 
 .welcome-sub {
-  font-family: 'IM Fell English', serif;
+  font-family: 'Crimson Pro', serif;
   font-style: italic;
   color: var(--parchment-dim);
-  font-size: 0.88rem;
+  font-size: 0.98rem;
   max-width: 420px;
   line-height: 1.7;
 }
@@ -940,7 +942,7 @@ header h1 {
 }
 .welcome-stat .lbl {
   font-family: 'Cinzel', serif;
-  font-size: 0.52rem;
+  font-size: 0.62rem;
   color: var(--parchment-faint);
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -954,9 +956,9 @@ header h1 {
   border: 1px solid rgba(74,107,74,0.25);
   border-radius: 2px;
   padding: 8px 16px;
-  font-family: 'IM Fell English', serif;
+  font-family: 'Crimson Pro', serif;
   font-style: italic;
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   color: var(--ref);
 }
 
@@ -966,9 +968,9 @@ header h1 {
   padding: 28px 50px;
   cursor: pointer;
   transition: all 0.2s;
-  font-family: 'IM Fell English', serif;
+  font-family: 'Crimson Pro', serif;
   font-style: italic;
-  font-size: 0.82rem;
+  font-size: 0.92rem;
   color: var(--parchment-faint);
   background: rgba(0,0,0,0.2);
 }
@@ -1032,7 +1034,7 @@ header h1 {
 
 .modal-title {
   font-family: 'Cinzel Decorative', 'Cinzel', serif;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: var(--gold-bright);
   letter-spacing: 3px;
@@ -1090,9 +1092,9 @@ header h1 {
   border: 1px solid var(--sage);
   border-radius: 2px;
   padding: 10px 16px;
-  font-family: 'IM Fell English', serif;
+  font-family: 'Crimson Pro', serif;
   font-style: italic;
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   color: var(--sage-bright);
   z-index: 9000;
   box-shadow: 0 4px 20px rgba(0,0,0,0.6), 0 0 12px rgba(74,107,74,0.2);
@@ -1112,10 +1114,10 @@ header h1 {
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  font-family: 'IM Fell English', serif;
+  font-family: 'Crimson Pro', serif;
   font-style: italic;
   color: var(--parchment-faint);
-  font-size: 0.82rem;
+  font-size: 0.92rem;
 }
 .empty-state::before {
   content: '✦ ';
@@ -1161,7 +1163,7 @@ header h1 {
     <div class="main-toolbar">
       <div class="breadcrumb" id="breadcrumb">Load a scroll to begin</div>
       <div class="search-box">
-        <span style="color:var(--parchment-faint);font-size:0.75rem">⚔</span>
+        <span style="color:var(--parchment-faint);font-size: 0.85rem">⚔</span>
         <input type="text" id="searchInput" placeholder="Search appraisals…" oninput="filterAppraisals()">
       </div>
     </div>
@@ -1180,7 +1182,7 @@ header h1 {
         </div>
         <div class="drop-zone" id="dropZone" onclick="loadFile()">
           Click to load a JSON scroll<br>
-          <small style="opacity:0.55;font-size:0.7rem">or drag &amp; drop the file here</small>
+          <small style="opacity:0.55;font-size: 0.8rem">or drag &amp; drop the file here</small>
         </div>
         <div class="welcome-grid" id="statsGrid" style="display:none"></div>
       </div>
@@ -1211,8 +1213,8 @@ header h1 {
           <img class="modal-preview-icon" id="modalPreviewIcon" src="" alt="" style="display:none">
           <div id="modalPreviewIconPh" style="width:36px;height:36px;border-radius:2px;border:1px solid var(--stone-border);background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">⏳</div>
           <div>
-            <div id="modalPreviewName" style="font-family:'Cinzel',serif;font-size:0.7rem;font-weight:600;color:var(--parchment);margin-bottom:4px">Loading…</div>
-            <a id="modalPreviewLink" href="#" target="_blank" style="font-family:'IM Fell English',serif;font-style:italic;font-size:0.62rem;color:var(--ref);text-decoration:none">↗ reference.dd-on.com</a>
+            <div id="modalPreviewName" style="font-family:'Cinzel',serif;font-size: 0.8rem;font-weight:600;color:var(--parchment);margin-bottom:4px">Loading…</div>
+            <a id="modalPreviewLink" href="#" target="_blank" style="font-family:'Crimson Pro',serif;font-style:italic;font-size: 0.72rem;color:var(--ref);text-decoration:none">↗ reference.dd-on.com</a>
           </div>
         </div>
         <div class="field-group">
@@ -1277,6 +1279,73 @@ header h1 {
       <div class="modal-footer">
         <button class="btn btn-ghost" onclick="closeModal('addCategoryModal')">Dismiss</button>
         <button class="btn btn-primary" onclick="confirmAddCategory()">Inscribe</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CREST EDITOR MODAL ══════════════════════════════ -->
+<div class="modal" id="crestModal">
+  <div class="modal-overlay">
+    <div class="modal-box" style="max-width:560px">
+      <div class="modal-title">Edit Crests</div>
+
+      <!-- Item identity line -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;padding:8px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--stone-border);border-radius:2px">
+        <img id="crestModalIcon" style="width:32px;height:32px;border-radius:2px;border:1px solid var(--stone-border);image-rendering:pixelated;display:none" src="" alt="">
+        <div id="crestModalIconPh" style="width:32px;height:32px;border-radius:2px;border:1px solid var(--stone-border);background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🗡️</div>
+        <div>
+          <div id="crestModalItemName" style="font-family:'Cinzel',serif;font-size:0.82rem;font-weight:600;color:var(--parchment)">Item</div>
+          <div id="crestModalItemId" style="font-family:'Crimson Pro',serif;font-style:italic;font-size:0.72rem;color:var(--gold-dim)">ID: —</div>
+        </div>
+      </div>
+
+      <!-- Crest type selector -->
+      <div class="field-group" style="margin-bottom:16px">
+        <span class="field-label">Crest Type</span>
+        <select class="field-input" id="crestTypeSelect" onchange="onCrestTypeChange()">
+          <option value="none">— No Crest —</option>
+          <option value="CrestLottery">Crest Lottery (random pool)</option>
+          <option value="Imbued">Imbued (fixed crest)</option>
+          <option value="DragonTrinketAlpha">Dragon Trinket Alpha</option>
+          <option value="DragonTrinketBeta">Dragon Trinket Beta</option>
+        </select>
+      </div>
+
+      <!-- CrestLottery fields -->
+      <div id="crestLotteryFields" style="display:none">
+        <div class="field-label" style="margin-bottom:8px">Lottery Values (one numeric ID per line)</div>
+        <textarea class="field-input" id="crestLotteryValues"
+          style="min-height:120px;resize:vertical;font-family:'Crimson Pro',serif;font-size:0.88rem;line-height:1.6"
+          placeholder="Enter crest IDs, one per line&#10;e.g.&#10;101&#10;102&#10;103"></textarea>
+        <div style="font-family:'Crimson Pro',serif;font-style:italic;font-size:0.72rem;color:var(--parchment-faint);margin-top:5px">
+          Each line becomes one entry in the <code style="font-style:normal;color:var(--gold-dim)">values</code> array.
+        </div>
+      </div>
+
+      <!-- Imbued fields -->
+      <div id="crestImbuedFields" style="display:none">
+        <div class="field-group">
+          <span class="field-label">Crest ID</span>
+          <input class="field-input" id="crestImbuedId" type="number" placeholder="e.g. 42">
+        </div>
+      </div>
+
+      <!-- DragonTrinket fields (shared for Alpha/Beta) -->
+      <div id="crestTrinketFields" style="display:none">
+        <div class="field-group">
+          <span class="field-label">Job ID</span>
+          <input class="field-input" id="crestTrinketJobId" type="number" placeholder="e.g. 1">
+        </div>
+        <div style="font-family:'Crimson Pro',serif;font-style:italic;font-size:0.72rem;color:var(--parchment-faint);margin-top:6px">
+          Alpha = primary job trinket · Beta = secondary job trinket
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('crestModal')">Dismiss</button>
+        <button class="btn btn-danger btn-sm" onclick="removeCrest()" id="crestRemoveBtn" style="display:none">Remove Crest</button>
+        <button class="btn btn-primary" onclick="confirmCrest()">Apply Crest</button>
       </div>
     </div>
   </div>
@@ -1407,7 +1476,7 @@ function renderTree() {
             <span class="count-badge">${(c.appraisals||[]).length}</span>
           </div>`).join('')}
         <div style="padding:5px 8px">
-          <button class="btn btn-ghost btn-sm" style="width:100%;font-size:0.58rem"
+          <button class="btn btn-ghost btn-sm" style="width:100%;font-size: 0.68rem"
             onclick="addCatToShop(${si},event)">+ Add Category</button>
         </div>
       </div>
@@ -1507,11 +1576,11 @@ function renderCard(a, ai) {
         <div class="appraisal-meta">
           <div class="field-group" style="flex:2;min-width:190px">
             <span class="field-label">Label</span>
-            <input class="field-input" value="${escAttr(a.label||'')}" oninput="updApprField(${ai},'label',this.value)" style="font-size:0.73rem">
+            <input class="field-input" value="${escAttr(a.label||'')}" oninput="updApprField(${ai},'label',this.value)" style="font-size: 0.83rem">
           </div>
           <div class="field-group" style="flex:2;min-width:190px">
             <span class="field-label">Comment</span>
-            <input class="field-input" value="${escAttr(a.comment||'')}" oninput="updApprField(${ai},'comment',this.value)" style="font-size:0.73rem">
+            <input class="field-input" value="${escAttr(a.comment||'')}" oninput="updApprField(${ai},'comment',this.value)" style="font-size: 0.83rem">
           </div>
         </div>
 
@@ -1549,7 +1618,15 @@ function itemRow(ai, section, item, ii, showCrests) {
            onmouseenter="showTooltip(event,${id})" onmouseleave="hideTooltip()">?</div>`;
 
   const crestCell = showCrests
-    ? `<td>${item.crests?`<span class="crest-pill" title="${escAttr(JSON.stringify(item.crests))}">${fmtCrest(item.crests)}</span>`:'—'}</td>`
+    ? `<td>
+        <div style="display:flex;align-items:center;gap:6px">
+          ${item.crests
+            ? `<span class="crest-pill" title="${escAttr(JSON.stringify(item.crests))}">${fmtCrest(item.crests)}</span>`
+            : `<span style="color:var(--parchment-faint);font-style:italic;font-size:0.72rem">none</span>`}
+          <button class="btn btn-ghost btn-sm" style="padding:2px 7px;font-size:0.6rem;flex-shrink:0"
+            onclick="openCrestModal(${ai},'${section}',${ii},event)">✦ Crests</button>
+        </div>
+      </td>`
     : '';
 
   return `<tr>
@@ -1869,6 +1946,119 @@ document.querySelectorAll('.modal').forEach(m=>{
     if(e.target===this) m.classList.remove('open');
   });
 });
+
+
+// ── Crest Editor ─────────────────────────────────────────────
+let _crestCtx = {};
+
+function openCrestModal(ai, sec, ii, e) {
+  e.stopPropagation();
+  _crestCtx = { ai, sec, ii };
+  const item = getCat().appraisals[ai][sec][ii];
+
+  // Populate item identity
+  document.getElementById('crestModalItemName').textContent = item.name || `Item #${item.item_id}`;
+  document.getElementById('crestModalItemId').textContent = `ID: ${item.item_id}`;
+
+  // Icon
+  const url = iconCache[item.item_id];
+  const iconEl = document.getElementById('crestModalIcon');
+  const phEl  = document.getElementById('crestModalIconPh');
+  if (url && url !== 'NONE' && url !== 'LOADING') {
+    iconEl.src = url; iconEl.style.display = 'block'; phEl.style.display = 'none';
+  } else {
+    iconEl.style.display = 'none'; phEl.style.display = 'flex';
+    resolveItem(item.item_id).then(() => {
+      const u = iconCache[item.item_id];
+      if (u && u !== 'NONE') { iconEl.src = u; iconEl.style.display = 'block'; phEl.style.display = 'none'; }
+    });
+  }
+
+  // Populate crest fields from existing data
+  const crest = (item.crests && item.crests[0]) ? item.crests[0] : null;
+  const sel = document.getElementById('crestTypeSelect');
+
+  if (!crest) {
+    sel.value = 'none';
+  } else {
+    sel.value = crest.type;
+  }
+
+  // Populate type-specific fields
+  document.getElementById('crestLotteryValues').value = '';
+  document.getElementById('crestImbuedId').value = '';
+  document.getElementById('crestTrinketJobId').value = '';
+
+  if (crest) {
+    if (crest.type === 'CrestLottery' && crest.values) {
+      document.getElementById('crestLotteryValues').value = crest.values.join('\n');
+    }
+    if (crest.type === 'Imbued' && crest.crest_id != null) {
+      document.getElementById('crestImbuedId').value = crest.crest_id;
+    }
+    if ((crest.type === 'DragonTrinketAlpha' || crest.type === 'DragonTrinketBeta') && crest.job_id != null) {
+      document.getElementById('crestTrinketJobId').value = crest.job_id;
+    }
+  }
+
+  // Show/hide remove button
+  document.getElementById('crestRemoveBtn').style.display = crest ? 'inline-flex' : 'none';
+
+  onCrestTypeChange();
+  document.getElementById('crestModal').classList.add('open');
+}
+
+function onCrestTypeChange() {
+  const type = document.getElementById('crestTypeSelect').value;
+  document.getElementById('crestLotteryFields').style.display  = type === 'CrestLottery' ? 'block' : 'none';
+  document.getElementById('crestImbuedFields').style.display   = type === 'Imbued'       ? 'block' : 'none';
+  document.getElementById('crestTrinketFields').style.display  =
+    (type === 'DragonTrinketAlpha' || type === 'DragonTrinketBeta') ? 'block' : 'none';
+}
+
+function confirmCrest() {
+  const { ai, sec, ii } = _crestCtx;
+  const item = getCat().appraisals[ai][sec][ii];
+  const type = document.getElementById('crestTypeSelect').value;
+
+  if (type === 'none') {
+    delete item.crests;
+    toast('Crests removed');
+  } else if (type === 'CrestLottery') {
+    const raw = document.getElementById('crestLotteryValues').value;
+    const values = raw.split('\n')
+      .map(s => s.trim())
+      .filter(s => s !== '')
+      .map(s => {
+        const n = parseInt(s);
+        return isNaN(n) ? s : n;
+      });
+    item.crests = [{ type: 'CrestLottery', values }];
+    toast(`Crest Lottery set — ${values.length} value(s)`);
+  } else if (type === 'Imbued') {
+    const id = parseInt(document.getElementById('crestImbuedId').value);
+    if (isNaN(id)) { toast('Crest ID is required', true); return; }
+    item.crests = [{ type: 'Imbued', crest_id: id }];
+    toast(`Imbued crest #${id} set`);
+  } else if (type === 'DragonTrinketAlpha' || type === 'DragonTrinketBeta') {
+    const jobId = parseInt(document.getElementById('crestTrinketJobId').value);
+    if (isNaN(jobId)) { toast('Job ID is required', true); return; }
+    item.crests = [{ type, job_id: jobId }];
+    toast(`${type} set — job ${jobId}`);
+  }
+
+  closeModal('crestModal');
+  renderCat();
+}
+
+function removeCrest() {
+  const { ai, sec, ii } = _crestCtx;
+  const item = getCat().appraisals[ai][sec][ii];
+  delete item.crests;
+  closeModal('crestModal');
+  renderCat();
+  toast('Crests removed');
+}
 
 // Ctrl+S
 document.addEventListener('keydown', e=>{
