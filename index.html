@@ -1287,10 +1287,10 @@ textarea.field-input {
 <!-- ═══ CREST EDITOR MODAL ══════════════════════════════ -->
 <div class="modal" id="crestModal">
   <div class="modal-overlay">
-    <div class="modal-box" style="max-width:560px">
+    <div class="modal-box" style="max-width:600px">
       <div class="modal-title">Edit Crests</div>
 
-      <!-- Item identity line -->
+      <!-- Item identity -->
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;padding:8px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--stone-border);border-radius:2px">
         <img id="crestModalIcon" style="width:32px;height:32px;border-radius:2px;border:1px solid var(--stone-border);image-rendering:pixelated;display:none" src="" alt="">
         <div id="crestModalIconPh" style="width:32px;height:32px;border-radius:2px;border:1px solid var(--stone-border);background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🗡️</div>
@@ -1300,7 +1300,7 @@ textarea.field-input {
         </div>
       </div>
 
-      <!-- Crest type selector -->
+      <!-- Crest type -->
       <div class="field-group" style="margin-bottom:16px">
         <span class="field-label">Crest Type</span>
         <select class="field-input" id="crestTypeSelect" onchange="onCrestTypeChange()">
@@ -1312,26 +1312,48 @@ textarea.field-input {
         </select>
       </div>
 
-      <!-- CrestLottery fields -->
+      <!-- ── CREST LOTTERY ── -->
       <div id="crestLotteryFields" style="display:none">
-        <div class="field-label" style="margin-bottom:8px">Lottery Values (one numeric ID per line)</div>
-        <textarea class="field-input" id="crestLotteryValues"
-          style="min-height:120px;resize:vertical;font-family:'Crimson Pro',serif;font-size:0.88rem;line-height:1.6"
-          placeholder="Enter crest IDs, one per line&#10;e.g.&#10;101&#10;102&#10;103"></textarea>
+        <div class="field-label" style="margin-bottom:8px">Lottery Pool — search &amp; add crests</div>
+
+        <!-- Search box -->
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <div style="flex:1;display:flex;align-items:center;background:rgba(0,0,0,0.35);border:1px solid var(--stone-border);border-radius:2px;padding:4px 10px;gap:6px">
+            <span style="color:var(--parchment-faint)">⚔</span>
+            <input id="crestSearch" class="field-input" style="border:none;background:none;padding:0;font-size:0.82rem"
+              placeholder="Search crest name or ID…" oninput="filterCrestDropdown()">
+          </div>
+        </div>
+
+        <!-- Dropdown results -->
+        <div id="crestDropdownList" style="max-height:160px;overflow-y:auto;background:rgba(0,0,0,0.4);border:1px solid var(--stone-border);border-radius:2px;margin-bottom:10px;display:none"></div>
+
+        <!-- Lottery pool chips -->
+        <div class="field-label" style="margin-bottom:6px">Pool contents (<span id="lotteryCount">0</span> crests)</div>
+        <div id="lotteryChips" style="display:flex;flex-wrap:wrap;gap:5px;min-height:36px;padding:6px;background:rgba(0,0,0,0.25);border:1px solid var(--stone-border);border-radius:2px"></div>
         <div style="font-family:'Crimson Pro',serif;font-style:italic;font-size:0.72rem;color:var(--parchment-faint);margin-top:5px">
-          Each line becomes one entry in the <code style="font-style:normal;color:var(--gold-dim)">values</code> array.
+          Click a crest in the search results to add it to the pool. Click ✕ on a chip to remove it.
         </div>
       </div>
 
-      <!-- Imbued fields -->
+      <!-- ── IMBUED ── -->
       <div id="crestImbuedFields" style="display:none">
-        <div class="field-group">
-          <span class="field-label">Crest ID</span>
-          <input class="field-input" id="crestImbuedId" type="number" placeholder="e.g. 42">
+        <div class="field-label" style="margin-bottom:8px">Select Crest</div>
+        <div style="display:flex;align-items:center;background:rgba(0,0,0,0.35);border:1px solid var(--stone-border);border-radius:2px;padding:4px 10px;gap:6px;margin-bottom:8px">
+          <span style="color:var(--parchment-faint)">⚔</span>
+          <input id="crestImbuedSearch" class="field-input" style="border:none;background:none;padding:0;font-size:0.82rem"
+            placeholder="Search crest name or ID…" oninput="filterImbuedDropdown()">
         </div>
+        <div id="crestImbuedDropdown" style="max-height:180px;overflow-y:auto;background:rgba(0,0,0,0.4);border:1px solid var(--stone-border);border-radius:2px;margin-bottom:10px;display:none"></div>
+        <!-- Selected crest display -->
+        <div id="crestImbuedSelected" style="display:none;padding:8px 10px;background:rgba(200,146,42,0.08);border:1px solid var(--gold-dim);border-radius:2px">
+          <div style="font-family:'Cinzel',serif;font-size:0.72rem;color:var(--gold)" id="crestImbuedSelectedName">—</div>
+          <div style="font-family:'Crimson Pro',serif;font-style:italic;font-size:0.68rem;color:var(--parchment-faint)" id="crestImbuedSelectedId">ID: —</div>
+        </div>
+        <input type="hidden" id="crestImbuedId">
       </div>
 
-      <!-- DragonTrinket fields (shared for Alpha/Beta) -->
+      <!-- ── DRAGON TRINKET ── -->
       <div id="crestTrinketFields" style="display:none">
         <div class="field-group">
           <span class="field-label">Job ID</span>
@@ -1948,19 +1970,435 @@ document.querySelectorAll('.modal').forEach(m=>{
 });
 
 
+const CREST_DB = [
+  [9193, 'Crest of Lightness'],
+  [9285, 'Crest of Lightness'],
+  [9194, 'Crest of Unburdening'],
+  [9286, 'Crest of Unburdening'],
+  [9195, 'Crest of Power'],
+  [9196, 'Crest of Greater Power'],
+  [9197, 'Crest of Sheer Power'],
+  [9198, 'Crest of Herculean Power'],
+  [9199, 'Crest of Magick'],
+  [9200, 'Crest of Greater Magick'],
+  [9201, 'Crest of Sheer Magick'],
+  [9202, 'Crest of Superior Magick'],
+  [9203, 'Crest of Increased Attack'],
+  [9204, 'Crest of Amplified Attack'],
+  [9205, 'Crest of Dazzling'],
+  [9209, 'Crest of Flesh Cutting'],
+  [9210, 'Crest of Flesh Cutting II'],
+  [9211, 'Crest of Beast Hunting'],
+  [9212, 'Crest of Beast Hunting II'],
+  [9213, 'Crest of Demon Slaying'],
+  [9214, 'Crest of Demon Slaying II'],
+  [9215, 'Crest of Massacre'],
+  [9216, 'Crest of Massacre II'],
+  [9217, 'Crest of Fracturing'],
+  [9218, 'Crest of Fracturing II'],
+  [9219, 'Crest of Mutilation'],
+  [9220, 'Crest of Mutilation II'],
+  [9221, 'Crest of Giant Killing'],
+  [9222, 'Crest of Giant Killing II'],
+  [9223, 'Crest of Splicing'],
+  [9224, 'Crest of Splicing II'],
+  [9225, 'Crest of Purification'],
+  [9226, 'Crest of Purification II'],
+  [9227, 'Crest of Exorcism'],
+  [9228, 'Crest of Exorcism II'],
+  [9229, 'Crest of Dismantling'],
+  [9230, 'Crest of Dismantling II'],
+  [9231, 'Crest of Manslaying'],
+  [9232, 'Crest of Manslaying II'],
+  [9233, 'Crest of Sealed Alchemy'],
+  [9234, 'Crest of Sealed Alchemy II'],
+  [9235, 'Crest of Dragonsbane'],
+  [9236, 'Crest of Dragonsbane II'],
+  [9237, 'Crest of Demon Expulsion'],
+  [9238, 'Crest of Demon Expulsion II'],
+  [9239, 'Crest of Poison'],
+  [9240, 'Crest of Fatal Poison'],
+  [9241, 'Crest of Torpor'],
+  [9242, 'Crest of Greater Torpor'],
+  [9243, 'Crest of Sleep'],
+  [9244, 'Crest of Deeper Sleep'],
+  [9245, 'Crest of Drenching'],
+  [9246, 'Crest of Drowning'],
+  [9247, 'Crest of Tarring'],
+  [9248, 'Crest of Greater Tarring'],
+  [9249, 'Crest of Stifling'],
+  [9250, 'Crest of Sealing'],
+  [9251, 'Crest of Frailness'],
+  [9252, 'Crest of Fragility'],
+  [9253, 'Crest of Petrification'],
+  [9254, 'Crest of Crystallization'],
+  [9255, 'Crest of Gilding'],
+  [9256, 'Crest of Glittering Gold'],
+  [9257, 'Crest of Burning'],
+  [9258, 'Crest of Incineration'],
+  [9259, 'Crest of Freezing'],
+  [9260, 'Crest of Permafrost'],
+  [9261, 'Crest of Shock'],
+  [9262, 'Crest of Electrocution'],
+  [9263, 'Crest of Holy Drain'],
+  [9264, 'Crest of Sanctity'],
+  [9265, 'Crest of Blinding'],
+  [9266, 'Crest of Twilight'],
+  [9267, 'Crest of Decreased Fire Resist'],
+  [9268, 'Crest of Diminished Fire Resist'],
+  [9269, 'Crest of Decreased Ice Resist'],
+  [9270, 'Crest of Diminished Ice Resist'],
+  [9271, 'Crest of Decreased Lightning Resist'],
+  [9272, 'Crest of Diminished Lightning Resist'],
+  [9273, 'Crest of Decreased Holy Resist'],
+  [9274, 'Crest of Diminished Holy Resist'],
+  [9275, 'Crest of Decreased Dark Resist'],
+  [9276, 'Crest of Diminished Dark Resist'],
+  [9277, 'Crest of Lowered Strength'],
+  [9278, 'Crest of Dwindled Strength'],
+  [9279, 'Crest of Lowered Defense'],
+  [9280, 'Crest of Dwindled Defense'],
+  [9281, 'Crest of Lowered Magick'],
+  [9282, 'Crest of Dwindled Magick'],
+  [9283, 'Crest of Lowered Magick Defense'],
+  [9284, 'Crest of Dwindled Magick Defense'],
+  [9287, 'Crest of Protection'],
+  [9288, 'Crest of Greater Protection'],
+  [9289, 'Crest of Sheer Protection'],
+  [9290, 'Crest of Firm Protection'],
+  [9291, 'Crest of Intelligence'],
+  [9292, 'Crest of Greater Intelligence'],
+  [9293, 'Crest of Sheer Intelligence'],
+  [9294, 'Crest of Wisdom'],
+  [9295, 'Crest of Perseverance'],
+  [9296, 'Crest of Stubborn Perseverance'],
+  [9297, 'Crest of Restoration'],
+  [9298, 'Crest of Fortitude'],
+  [9299, 'Crest of Fire Warding'],
+  [9300, 'Crest of Flame Warding'],
+  [9301, 'Crest of Hellfire Warding'],
+  [9302, 'Crest of Cold Warding'],
+  [9303, 'Crest of Ice Warding'],
+  [9304, 'Crest of Snowstorm Warding'],
+  [9305, 'Crest of Electricity Warding'],
+  [9306, 'Crest of Lightning Warding'],
+  [9307, 'Crest of Thunder Warding'],
+  [9308, 'Crest of Light Warding'],
+  [9309, 'Crest of Holy Warding'],
+  [9310, 'Crest of Sacred Warding'],
+  [9311, 'Crest of Gloom Warding'],
+  [9312, 'Crest of Dark Warding'],
+  [9313, 'Crest of Shadow Warding'],
+  [9314, 'Crest of Burn Warding'],
+  [9315, 'Crest of Burn Prevention'],
+  [9316, 'Crest of Burn Immunity'],
+  [9317, 'Crest of Freeze Warding'],
+  [9318, 'Crest of Freeze Prevention'],
+  [9319, 'Crest of Freeze Immunity'],
+  [9320, 'Crest of Shock Warding'],
+  [9321, 'Crest of Shock Prevention'],
+  [9322, 'Crest of Shock Immunity'],
+  [9323, 'Crest of Holy Drain Warding'],
+  [9324, 'Crest of Holy Drain Prevention'],
+  [9325, 'Crest of Holy Drain Immunity'],
+  [9326, 'Crest of Blind Warding'],
+  [9327, 'Crest of Blind Prevention'],
+  [9328, 'Crest of Blind Immunity'],
+  [9329, 'Crest of Poison Warding'],
+  [9330, 'Crest of Poison Prevention'],
+  [9331, 'Crest of Torpor Warding'],
+  [9332, 'Crest of Torpor Prevention'],
+  [9333, 'Crest of Sleep Warding'],
+  [9334, 'Crest of Sleep Prevention'],
+  [9335, 'Crest of Stunning Warding'],
+  [9336, 'Crest of Stunning Prevention'],
+  [9337, 'Crest of Drench Warding'],
+  [9338, 'Crest of Drench Prevention'],
+  [9339, 'Crest of Tar Warding'],
+  [9340, 'Crest of Tar Prevention'],
+  [9341, 'Crest of Stifle Warding'],
+  [9342, 'Crest of Stifle Prevention'],
+  [9343, 'Crest of Curse Warding'],
+  [9344, 'Crest of Curse Prevention'],
+  [9345, 'Crest of Frail Warding'],
+  [9346, 'Crest of Frail Prevention'],
+  [9347, 'Crest of Petrification Warding'],
+  [9348, 'Crest of Petrification Prevention'],
+  [9349, 'Crest of Golden Warding'],
+  [9350, 'Crest of Golden Prevention'],
+  [11719, 'Crest of Power+'],
+  [11720, 'Crest of Magick+'],
+  [11721, 'Crest of Lowered Defense+'],
+  [11722, 'Crest of Lowered Magick Defense+'],
+  [11723, 'Crest of Lowered Strength+'],
+  [11724, 'Crest of Lowered Magick+'],
+  [11725, 'Crest of Flesh Cutting III'],
+  [11726, 'Crest of Beast Hunting III'],
+  [11727, 'Crest of Demon Slaying III'],
+  [11728, 'Crest of Massacre III'],
+  [11729, 'Crest of Fracturing III'],
+  [11730, 'Crest of Mutilation III'],
+  [11731, 'Crest of Giant Killing III'],
+  [11732, 'Crest of Splicing III'],
+  [11733, 'Crest of Purification III'],
+  [11734, 'Crest of Exorcism III'],
+  [11735, 'Crest of Dismantling III'],
+  [11736, 'Crest of Manslaying III'],
+  [11737, 'Crest of Sealed Alchemy III'],
+  [11738, 'Crest of Dragonsbane III'],
+  [11739, 'Crest of Demon Expulsion III'],
+  [11740, 'Crest of Protection+'],
+  [11741, 'Crest of Intelligence+'],
+  [11742, 'Crest of Perseverance+'],
+  [11743, 'Crest of Restoration+'],
+  [11744, 'Crest of Fire Warding+'],
+  [11745, 'Crest of Cold Warding+'],
+  [11746, 'Crest of Electricity Warding+'],
+  [11747, 'Crest of Light Warding+'],
+  [11748, 'Crest of Gloom Warding+'],
+  [13653, 'Crest of Burning+'],
+  [13654, 'Crest of Freezing+'],
+  [13655, 'Crest of Shock+'],
+  [13656, 'Crest of Holy Drain+'],
+  [13657, 'Crest of Blinding+'],
+  [13658, 'Crest of Greater Power+'],
+  [13659, 'Crest of Greater Magick+'],
+  [13660, 'Crest of Poison+'],
+  [13661, 'Crest of Torpor+'],
+  [13662, 'Crest of Flesh Cutting IV'],
+  [13663, 'Crest of Beast Hunting IV'],
+  [13664, 'Crest of Demon Slaying IV'],
+  [13665, 'Crest of Massacre IV'],
+  [13666, 'Crest of Fracturing IV'],
+  [13667, 'Crest of Mutilation IV'],
+  [13668, 'Crest of Giant Killing IV'],
+  [13669, 'Crest of Splicing IV'],
+  [13670, 'Crest of Purification IV'],
+  [13671, 'Crest of Exorcism IV'],
+  [13672, 'Crest of Dismantling IV'],
+  [13673, 'Crest of Manslaying IV'],
+  [13674, 'Crest of Dwindled Strength+'],
+  [13675, 'Crest of Dwindled Defense+'],
+  [13676, 'Crest of Dwindled Magick+'],
+  [13677, 'Crest of Dwindled Magick Defense+'],
+  [13678, 'Crest of Stubborn Perseverance+'],
+  [13679, 'Crest of Flame Warding+'],
+  [13680, 'Crest of Ice Warding+'],
+  [13681, 'Crest of Lightning Warding+'],
+  [13682, 'Crest of Holy Warding+'],
+  [13683, 'Crest of Dark Warding+'],
+  [13684, 'Crest of Burn Warding+'],
+  [13685, 'Crest of Freeze Warding+'],
+  [13686, 'Crest of Shock Warding+'],
+  [13687, 'Crest of Holy Drain Warding+'],
+  [13688, 'Crest of Blind Warding+'],
+  [13689, 'Crest of Poison Warding+'],
+  [13690, 'Crest of Torpor Warding+'],
+  [13691, 'Crest of Sleep Warding+'],
+  [13692, 'Crest of Stunning Warding+'],
+  [13693, 'Crest of Drench Warding+'],
+  [13694, 'Crest of Tar Warding+'],
+  [13695, 'Crest of Stifle Warding+'],
+  [13696, 'Crest of Curse Warding+'],
+  [13697, 'Crest of Frail Warding+'],
+  [13698, 'Crest of Petrification Warding+'],
+  [13699, 'Crest of Golden Warding+'],
+  [13700, 'Crest of Decreased Fire Resist Prevention'],
+  [13701, 'Crest of Decreased Ice Resist Prevention'],
+  [13702, 'Crest of Decreased Thunder Resist Prevention'],
+  [13703, 'Crest of Decreased Holy Resist Prevention'],
+  [13704, 'Crest of Decreased Dark Resist Prevention'],
+  [13705, 'Crest of Lowered Strength Prevention'],
+  [13706, 'Crest of Lowered Magick Prevention'],
+  [13707, 'Crest of Lowered Defense Prevention'],
+  [13708, 'Crest of Lowered Magick Prevention'],
+  [14183, 'Crest of Sealed Alchemy IV'],
+  [14184, 'Crest of Dragonsbane IV'],
+  [14185, 'Crest of Demon Expulsion IV'],
+  [14186, 'Crest of Greater Protection+'],
+  [14187, 'Crest of Greater Intelligence+'],
+  [14188, 'Crest of Fortitude+'],
+  [16030, 'Crest of Herculean Power (Burning)'],
+  [16031, 'Crest of Herculean Power (Freezing)'],
+  [16032, 'Crest of Herculean Power (Shock)'],
+  [16033, 'Crest of Herculean Power (Holy Drain)'],
+  [16034, 'Crest of Herculean Power (Blinding)'],
+  [16035, 'Crest of Superior Magick (Burning)'],
+  [16036, 'Crest of Superior Magick (Freezing)'],
+  [16040, 'Crest of Superior Magick (Shock)'],
+  [16041, 'Crest of Superior Magick (Holy Drain)'],
+  [16042, 'Crest of Superior Magick (Blinding)'],
+  [16043, 'Crest of Herculean Power (Blow Power)'],
+  [16044, 'Crest of Herculean Power (Stun)'],
+  [16045, 'Crest of Herculean Power (Poison)'],
+  [16046, 'Crest of Herculean Power (Torpor)'],
+  [16047, 'Crest of Herculean Power (Sleep)'],
+  [16048, 'Crest of Herculean Power (Petrification)'],
+  [16049, 'Crest of Herculean Power (Gilding)'],
+  [16050, 'Crest of Herculean Power (Lowered Defense)'],
+  [16051, 'Crest of Superior Magick (Blow Power)'],
+  [16052, 'Crest of Superior Magick (Stun)'],
+  [16053, 'Crest of Superior Magick (Poison)'],
+  [16054, 'Crest of Superior Magick (Torpor)'],
+  [16055, 'Crest of Superior Magick (Sleep)'],
+  [16056, 'Crest of Superior Magick (Petrification)'],
+  [16057, 'Crest of Superior Magick (Gilding)'],
+  [16058, 'Crest of Superior Magick (Lowered Magick Defense)'],
+  [16059, 'Crest of Herculean Power (Lightness)'],
+  [16060, 'Crest of Superior Magick (Lightness)'],
+  [16061, 'Crest of Incineration (Decreased Fire Resist)'],
+  [16062, 'Crest of Permafrost (Decreased Ice Resist)'],
+  [16063, 'Crest of Electrocution (Decreased Lightning Resist)'],
+  [16064, 'Crest of Sanctity (Decreased Holy Resist)'],
+  [16065, 'Crest of Twilight (Decreased Dark Resist)'],
+  [16066, 'Crest of Strong Health'],
+  [16067, 'Crest of Health'],
+  [16068, 'Crest of Strong Stamina'],
+  [16069, 'Crest of Stamina'],
+  [16070, 'Crest of Firm Protection (Health)'],
+  [16071, 'Crest of Firm Protection (Endurance)'],
+  [16072, 'Crest of Firm Protection (Vitality)'],
+  [16073, 'Crest of Firm Protection (Lightness)'],
+  [16074, 'Crest of Wisdom (Health)'],
+  [16075, 'Crest of Wisdom (Endurance)'],
+  [16076, 'Crest of Wisdom (Vitality)'],
+  [16077, 'Crest of Wisdom (Lightness)'],
+  [16078, 'Crest of Unwavering'],
+  [16079, 'Crest of Vigor'],
+  [16080, 'Crest of Fire Barrier'],
+  [16081, 'Crest of Ice Barrier'],
+  [16082, 'Crest of Lightning Barrier'],
+  [16083, 'Crest of Holy Barrier'],
+  [16084, 'Crest of Dark Barrier'],
+  [16085, 'Crest of Double Resist (Poison/Torpor)'],
+  [16086, 'Crest of Double Resist (Sleep/Stun)'],
+  [16087, 'Crest of Double Resist (Petrify/Gild)'],
+  [16088, 'Crest of Double Resist (Curse/Stifle)'],
+  [16089, 'Crest of Double Resist (Lowered Strength/Defense)'],
+  [16090, 'Crest of Double Resist (Lowered Magick/Magick Defense)'],
+  [16091, 'Crest of Fire Protection'],
+  [16092, 'Crest of Ice Protection'],
+  [16093, 'Crest of Lightning Protection'],
+  [16094, 'Crest of Holy Protection'],
+  [16095, 'Crest of Dark Protection'],
+  [16096, 'Crest of Triple Resist (Sleep/Poison/Slow)'],
+  [16097, 'Crest of Triple Resist (Stun/Curse/Stifle)'],
+  [16098, 'Crest of Triple Resist (Petrify/Gild/Frail)'],
+  [16099, 'Crest of Stature Protection'],
+  [19363, 'Crest of War-Ready Break I'],
+  [19364, 'Crest of War-Ready Break II'],
+  [19365, 'Crest of War-Ready Break III'],
+  [19366, 'Crest of War-Ready Break IV'],
+  [24721, 'Anti-Black Dragon'],
+  [25654, 'Crest of Sheer Power+'],
+  [25655, 'Crest of Herculean Power+'],
+  [25656, 'Crest of Herculean Power (Burning)+'],
+  [25657, 'Crest of Herculean Power (Freezing)+'],
+  [25658, 'Crest of Herculean Power (Shock)+'],
+  [25659, 'Crest of Herculean Power (Holy Drain)+'],
+  [25660, 'Crest of Herculean Power (Blinding)+'],
+  [25661, 'Crest of Herculean Power (Blow Power)+'],
+  [25662, 'Crest of Herculean Power (Stun)+'],
+  [25663, 'Crest of Herculean Power (Poison)+'],
+  [25664, 'Crest of Herculean Power (Torpor)+'],
+  [25665, 'Crest of Herculean Power (Sleep)+'],
+  [25666, 'Crest of Herculean Power (Petrification)+'],
+  [25668, 'Crest of Herculean Power (Gilding)+'],
+  [25669, 'Crest of Herculean Power (Lowered Defense)+'],
+  [25670, 'Crest of Sheer Magick+'],
+  [25671, 'Crest of Superior Magick+'],
+  [25672, 'Crest of Superior Magick (Burning)+'],
+  [25673, 'Crest of Superior Magick (Shock)+'],
+  [25674, 'Crest of Superior Magick (Holy Drain)+'],
+  [25675, 'Crest of Superior Magick (Blow Power)+'],
+  [25676, 'Crest of Superior Magick (Blinding)+'],
+  [25677, 'Crest of Superior Magick (Stun)+'],
+  [25678, 'Crest of Superior Magick (Poison)+'],
+  [25679, 'Crest of Superior Magick (Torpor)+'],
+  [25680, 'Crest of Superior Magick (Sleep)+'],
+  [25681, 'Crest of Superior Magick (Petrification)+'],
+  [25682, 'Crest of Superior Magick (Gilding)+'],
+  [25683, 'Crest of Superior Magick (Lowered Magick Defense)+'],
+  [25684, 'Crest of Incineration+'],
+  [25685, 'Crest of Incineration (Decreased Fire Resist)+'],
+  [25686, 'Crest of Permafrost+'],
+  [25687, 'Crest of Permafrost (Decreased Ice Resist)+'],
+  [25688, 'Crest of Electrocution+'],
+  [25689, 'Crest of Electrocution (Decreased Lightning Resist)+'],
+  [25690, 'Crest of Sanctity+'],
+  [25691, 'Crest of Sanctity (Decreased Holy Resist)+'],
+  [25692, 'Crest of Twilight+'],
+  [25693, 'Crest of Twilight (Decreased Dark Resist)+'],
+  [25694, 'Crest of Depleted Defense+'],
+  [25695, 'Crest of Depleted Magick Defense+'],
+  [25696, 'Crest of Dazzling+'],
+  [25697, 'Crest of Sidesplitting Laughter+'],
+  [25698, 'Crest of Fatal Poison+'],
+  [25699, 'Crest of Sleep+'],
+  [25700, 'Crest of Deeper Sleep+'],
+  [25701, 'Crest of Gilding+'],
+  [25702, 'Crest of Glittering Gold+'],
+  [25703, 'Crest of Petrification+'],
+  [25704, 'Crest of Crystallization+'],
+  [25705, 'Crest of Frailness+'],
+  [25706, 'Crest of Fragility+'],
+  [25707, 'Crest of Stifling+'],
+  [25708, 'Crest of Sealing+'],
+  [25709, 'Crest of Drenching+'],
+  [25710, 'Crest of Drowning+'],
+  [25711, 'Crest of Tarring+'],
+  [25712, 'Crest of Greater Tarring+'],
+  [25713, 'Crest of Greater Torpor+'],
+  [25714, 'Crest of Increased Attack+'],
+  [25715, 'Crest of Amplified Attack+'],
+  [25716, 'Crest of Sheer Protection+'],
+  [25717, 'Crest of Firm Protection (Health)+'],
+  [25718, 'Crest of Firm Protection (Endurance)+'],
+  [25719, 'Crest of Firm Protection (Vitality)+'],
+  [25720, 'Crest of Firm Protection (Lightness)+'],
+  [25721, 'Crest of Unwavering+'],
+  [25722, 'Crest of Sheer Intelligence+'],
+  [25723, 'Crest of Wisdom+'],
+  [25724, 'Crest of Wisdom (Health)+'],
+  [25725, 'Crest of Wisdom (Endurance)+'],
+  [25726, 'Crest of Wisdom (Vitality)+'],
+  [25727, 'Crest of Wisdom (Lightness)+'],
+  [25728, 'Crest of Resurgence+'],
+  [25729, 'Crest of Stoicism+'],
+  [25730, 'Crest of Determination+'],
+  [25731, 'Crest of Pertinacity+'],
+  [25732, 'Crest of Health+'],
+  [25733, 'Crest of Strong Health+'],
+  [25734, 'Crest of Stamina+'],
+  [25735, 'Crest of Strong Stamina+'],
+  [25736, 'Crest of Vigor+'],
+  [25737, 'Crest of Lightness+'],
+  [25738, 'Crest of Unburdening+'],
+  [25739, 'Crest of Hellfire Warding+'],
+  [25740, 'Crest of Snowstorm Warding+'],
+  [25741, 'Crest of Thunder Warding+'],
+  [25742, 'Crest of Sacred Warding+'],
+  [25743, 'Crest of Shadow Warding+'],
+  [25744, 'Crest of Burn Immunity+'],
+  [25745, 'Crest of Freeze Immunity+'],
+  [25746, 'Crest of Shock Immunity+'],
+  [25747, 'Crest of Holy Drain Immunity+'],
+  [25748, 'Crest of Blind Immunity+']
+];
+
 // ── Crest Editor ─────────────────────────────────────────────
 let _crestCtx = {};
+let _lotteryPool = []; // [{id, name}]
+let _imbuedId = null;
 
 function openCrestModal(ai, sec, ii, e) {
   e.stopPropagation();
   _crestCtx = { ai, sec, ii };
   const item = getCat().appraisals[ai][sec][ii];
 
-  // Populate item identity
   document.getElementById('crestModalItemName').textContent = item.name || `Item #${item.item_id}`;
   document.getElementById('crestModalItemId').textContent = `ID: ${item.item_id}`;
 
-  // Icon
   const url = iconCache[item.item_id];
   const iconEl = document.getElementById('crestModalIcon');
   const phEl  = document.getElementById('crestModalIconPh');
@@ -1974,37 +2412,44 @@ function openCrestModal(ai, sec, ii, e) {
     });
   }
 
-  // Populate crest fields from existing data
   const crest = (item.crests && item.crests[0]) ? item.crests[0] : null;
   const sel = document.getElementById('crestTypeSelect');
+
+  // Reset state
+  _lotteryPool = [];
+  _imbuedId = null;
+  document.getElementById('crestSearch').value = '';
+  document.getElementById('crestImbuedSearch').value = '';
+  document.getElementById('crestDropdownList').style.display = 'none';
+  document.getElementById('crestImbuedDropdown').style.display = 'none';
+  document.getElementById('crestImbuedSelected').style.display = 'none';
+  document.getElementById('crestTrinketJobId').value = '';
 
   if (!crest) {
     sel.value = 'none';
   } else {
     sel.value = crest.type;
-  }
-
-  // Populate type-specific fields
-  document.getElementById('crestLotteryValues').value = '';
-  document.getElementById('crestImbuedId').value = '';
-  document.getElementById('crestTrinketJobId').value = '';
-
-  if (crest) {
     if (crest.type === 'CrestLottery' && crest.values) {
-      document.getElementById('crestLotteryValues').value = crest.values.join('\n');
+      _lotteryPool = crest.values.map(id => {
+        const entry = CREST_DB.find(e => e[0] === id);
+        return { id, name: entry ? entry[1] : `ID ${id}` };
+      });
     }
     if (crest.type === 'Imbued' && crest.crest_id != null) {
-      document.getElementById('crestImbuedId').value = crest.crest_id;
+      _imbuedId = crest.crest_id;
+      const entry = CREST_DB.find(e => e[0] === crest.crest_id);
+      const name = entry ? entry[1] : `ID ${crest.crest_id}`;
+      document.getElementById('crestImbuedSearch').value = name;
+      showImbuedSelected(crest.crest_id, name);
     }
     if ((crest.type === 'DragonTrinketAlpha' || crest.type === 'DragonTrinketBeta') && crest.job_id != null) {
       document.getElementById('crestTrinketJobId').value = crest.job_id;
     }
   }
 
-  // Show/hide remove button
   document.getElementById('crestRemoveBtn').style.display = crest ? 'inline-flex' : 'none';
-
   onCrestTypeChange();
+  renderLotteryChips();
   document.getElementById('crestModal').classList.add('open');
 }
 
@@ -2016,6 +2461,106 @@ function onCrestTypeChange() {
     (type === 'DragonTrinketAlpha' || type === 'DragonTrinketBeta') ? 'block' : 'none';
 }
 
+// ── Lottery picker ────────────────────────────────────────────
+function filterCrestDropdown() {
+  const q = document.getElementById('crestSearch').value.trim().toLowerCase();
+  const list = document.getElementById('crestDropdownList');
+  if (!q) { list.style.display = 'none'; return; }
+
+  const isNum = /^\d+$/.test(q);
+  const results = CREST_DB.filter(([id, name]) =>
+    isNum ? String(id).startsWith(q) : name.toLowerCase().includes(q)
+  ).slice(0, 40);
+
+  if (!results.length) { list.innerHTML = '<div style="padding:8px 10px;color:var(--parchment-faint);font-style:italic;font-size:0.75rem">No crests found</div>'; list.style.display = 'block'; return; }
+
+  list.innerHTML = results.map(([id, name]) => `
+    <div class="crest-row" onclick="addToLotteryPool(${id}, '${esc(name)}')"
+      style="padding:7px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(61,48,40,0.4);transition:background 0.1s">
+      <span style="font-family:"Cinzel",serif;font-size:0.62rem;color:var(--gold-dim);min-width:40px">${id}</span>
+      <span style="font-family:"Crimson Pro",serif;font-size:0.78rem;color:var(--parchment)">${esc(name)}</span>
+      <span style="margin-left:auto;font-size:0.62rem;color:var(--sage-bright)">+ Add</span>
+    </div>`).join('');
+
+  list.querySelectorAll('.crest-row').forEach(row => {
+    row.addEventListener('mouseenter', () => row.style.background = 'rgba(200,146,42,0.08)');
+    row.addEventListener('mouseleave', () => row.style.background = '');
+  });
+  list.style.display = 'block';
+}
+
+function addToLotteryPool(id, name) {
+  if (!_lotteryPool.find(e => e.id === id)) {
+    _lotteryPool.push({ id, name });
+    renderLotteryChips();
+  }
+  document.getElementById('crestSearch').value = '';
+  document.getElementById('crestDropdownList').style.display = 'none';
+}
+
+function removeFromLotteryPool(id) {
+  _lotteryPool = _lotteryPool.filter(e => e.id !== id);
+  renderLotteryChips();
+}
+
+function renderLotteryChips() {
+  const container = document.getElementById('lotteryChips');
+  const countEl = document.getElementById('lotteryCount');
+  countEl.textContent = _lotteryPool.length;
+  if (!_lotteryPool.length) {
+    container.innerHTML = '<span style="font-family:"Crimson Pro",serif;font-style:italic;font-size:0.72rem;color:var(--parchment-faint)">No crests in pool — search above to add</span>';
+    return;
+  }
+  container.innerHTML = _lotteryPool.map(({id, name}) => `
+    <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.3);border-radius:2px;padding:3px 8px;font-size:0.72rem">
+      <span style="font-family:"Cinzel",serif;font-size:0.58rem;color:var(--gold-dim)">${id}</span>
+      <span style="font-family:"Crimson Pro",serif;color:var(--parchment)">${esc(name)}</span>
+      <button onclick="removeFromLotteryPool(${id})" style="background:none;border:none;cursor:pointer;color:var(--crimson-bright);font-size:0.7rem;padding:0;line-height:1;margin-left:2px">✕</button>
+    </span>`).join('');
+}
+
+// ── Imbued picker ─────────────────────────────────────────────
+function filterImbuedDropdown() {
+  const q = document.getElementById('crestImbuedSearch').value.trim().toLowerCase();
+  const list = document.getElementById('crestImbuedDropdown');
+  if (!q) { list.style.display = 'none'; return; }
+
+  const isNum = /^\d+$/.test(q);
+  const results = CREST_DB.filter(([id, name]) =>
+    isNum ? String(id).startsWith(q) : name.toLowerCase().includes(q)
+  ).slice(0, 40);
+
+  if (!results.length) { list.innerHTML = '<div style="padding:8px 10px;color:var(--parchment-faint);font-style:italic;font-size:0.75rem">No crests found</div>'; list.style.display = 'block'; return; }
+
+  list.innerHTML = results.map(([id, name]) => `
+    <div class="crest-row-i" onclick="selectImbuedCrest(${id}, '${esc(name)}')"
+      style="padding:7px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(61,48,40,0.4);transition:background 0.1s">
+      <span style="font-family:"Cinzel",serif;font-size:0.62rem;color:var(--gold-dim);min-width:40px">${id}</span>
+      <span style="font-family:"Crimson Pro",serif;font-size:0.78rem;color:var(--parchment)">${esc(name)}</span>
+    </div>`).join('');
+
+  list.querySelectorAll('.crest-row-i').forEach(row => {
+    row.addEventListener('mouseenter', () => row.style.background = 'rgba(200,146,42,0.08)');
+    row.addEventListener('mouseleave', () => row.style.background = '');
+  });
+  list.style.display = 'block';
+}
+
+function selectImbuedCrest(id, name) {
+  _imbuedId = id;
+  document.getElementById('crestImbuedSearch').value = name;
+  document.getElementById('crestImbuedDropdown').style.display = 'none';
+  showImbuedSelected(id, name);
+}
+
+function showImbuedSelected(id, name) {
+  const box = document.getElementById('crestImbuedSelected');
+  document.getElementById('crestImbuedSelectedName').textContent = name;
+  document.getElementById('crestImbuedSelectedId').textContent = `Item ID: ${id}`;
+  box.style.display = 'block';
+}
+
+// ── Confirm / Remove ──────────────────────────────────────────
 function confirmCrest() {
   const { ai, sec, ii } = _crestCtx;
   const item = getCat().appraisals[ai][sec][ii];
@@ -2025,21 +2570,14 @@ function confirmCrest() {
     delete item.crests;
     toast('Crests removed');
   } else if (type === 'CrestLottery') {
-    const raw = document.getElementById('crestLotteryValues').value;
-    const values = raw.split('\n')
-      .map(s => s.trim())
-      .filter(s => s !== '')
-      .map(s => {
-        const n = parseInt(s);
-        return isNaN(n) ? s : n;
-      });
-    item.crests = [{ type: 'CrestLottery', values }];
-    toast(`Crest Lottery set — ${values.length} value(s)`);
+    if (!_lotteryPool.length) { toast('Add at least one crest to the pool', true); return; }
+    item.crests = [{ type: 'CrestLottery', values: _lotteryPool.map(e => e.id) }];
+    toast(`Crest Lottery set — ${_lotteryPool.length} crest(s)`);
   } else if (type === 'Imbued') {
-    const id = parseInt(document.getElementById('crestImbuedId').value);
-    if (isNaN(id)) { toast('Crest ID is required', true); return; }
-    item.crests = [{ type: 'Imbued', crest_id: id }];
-    toast(`Imbued crest #${id} set`);
+    if (!_imbuedId) { toast('Select a crest first', true); return; }
+    item.crests = [{ type: 'Imbued', crest_id: _imbuedId }];
+    const entry = CREST_DB.find(e => e[0] === _imbuedId);
+    toast(`Imbued: ${entry ? entry[1] : 'ID ' + _imbuedId}`);
   } else if (type === 'DragonTrinketAlpha' || type === 'DragonTrinketBeta') {
     const jobId = parseInt(document.getElementById('crestTrinketJobId').value);
     if (isNaN(jobId)) { toast('Job ID is required', true); return; }
@@ -2059,6 +2597,7 @@ function removeCrest() {
   renderCat();
   toast('Crests removed');
 }
+
 
 // Ctrl+S
 document.addEventListener('keydown', e=>{
